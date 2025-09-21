@@ -1,0 +1,1438 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Catalogue Régie — Interface 3 panneaux</title>
+  <style>
+    /* ===========================
+       Variables de thème
+       =========================== */
+    :root{
+      --bg1:#f5f7fb;
+      --bg2:#ffffff;
+      --panneau:#ffffff;
+      --bordure:#e5e7eb;
+      --texte:#0f172a;
+      --atténué:#64748b;
+      --bleu:#2563eb;
+      --bleu-50:#eff6ff;
+      --kaki:#9db596;          /* kaki doux (bandeau bas) */
+      --rayon:16px;
+      --ombre:0 6px 20px rgba(0,0,0,.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--texte);
+      background:linear-gradient(180deg,var(--bg1),#eef2ff 400px) fixed;
+      font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    }
+    .masqué{display:none !important}
+
+    /* ===========================
+       Animations (fade)
+       =========================== */
+    @keyframes fondu {
+      from { opacity:0; transform:translateY(6px) }
+      to   { opacity:1; transform:none }
+    }
+    .anime-fondu { animation: fondu .24s ease-out both }
+
+    /* ===========================
+       En-tête (collant)
+       =========================== */
+    header[role="banner"]{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter:saturate(140%) blur(6px);
+      background:color-mix(in oklab, var(--bg2) 80%, transparent);
+      border-bottom:1px solid var(--bordure);
+    }
+    .entete-interne{
+      max-width:1200px; margin:0 auto; padding:12px 16px;
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+    }
+    .marque{font-weight:700; letter-spacing:.2px}
+    .marque b{color:var(--bleu)}
+    .indice{color:var(--atténué); font-size:12px}
+
+    /* ===========================
+       Grille principale
+       =========================== */
+    .grille{
+      max-width:1200px; margin:16px auto; padding:0 16px 16px;
+      display:grid; gap:16px;
+      grid-template-columns:260px minmax(0,1fr) 380px;
+    }
+    @media (max-width: 980px){
+      .grille{grid-template-columns:1fr}
+    }
+    .panneau{
+      background:var(--panneau); border:1px solid var(--bordure);
+      border-radius:var(--rayon); box-shadow:var(--ombre);
+    }
+
+    /* ===========================
+       Rubriques (gauche)
+       =========================== */
+    nav[aria-label="Rubriques"]{padding:12px}
+    .rubriques{
+      display:flex; flex-direction:column; gap:8px; margin:0; padding:0; list-style:none;
+    }
+    .bouton-rubrique{
+      appearance:none; border:1px solid var(--bordure); background:var(--bg2);
+      padding:10px 12px; border-radius:12px; text-align:left; cursor:pointer;
+      display:flex; align-items:center; gap:10px; font-weight:600; color:var(--texte);
+    }
+    .bouton-rubrique:hover{border-color:color-mix(in oklab, var(--bordure), var(--bleu) 20%)}
+    .bouton-rubrique[aria-current="page"]{
+      background:var(--bleu-50); border-color:color-mix(in oklab, var(--bleu) 30%, var(--bordure));
+      outline:2px solid color-mix(in oklab, var(--bleu) 25%, transparent);
+    }
+    .emoji-rubrique{width:22px; text-align:center}
+
+    /* ===========================
+       Liste au centre
+       =========================== */
+    .centre{padding:12px}
+    .cartes{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px}
+    @media (max-width: 1200px){ .cartes{grid-template-columns:1fr} }
+
+    .carte{
+      appearance:none; border:1px solid var(--bordure); background:var(--bg2);
+      border-radius:12px; padding:12px; text-align:left; cursor:pointer;
+      display:block; width:100%;
+    }
+    .carte:hover{border-color:color-mix(in oklab, var(--bordure), var(--bleu) 25%)}
+    .carte:focus-visible{outline:2px solid var(--bleu); outline-offset:2px}
+    .carte[aria-pressed="true"]{
+      background:var(--bleu-50);
+      border-color:color-mix(in oklab, var(--bleu) 30%, var(--bordure));
+      box-shadow:0 0 0 3px color-mix(in oklab, var(--bleu) 20%, transparent) inset;
+    }
+    .ligne-carte{display:flex; gap:12px}
+    .avatar{
+      width:38px; height:38px; border-radius:10px; flex:0 0 auto;
+      display:grid; place-items:center; font-weight:800;
+      color:var(--bleu); background:color-mix(in oklab, white 70%, var(--bleu));
+      border:1px solid color-mix(in oklab, var(--bleu) 35%, white);
+    }
+    .grandit{min-width:0}
+    .titre{margin:0 0 2px; font-size:15px}
+    .soustitre{color:var(--atténué); font-size:12px; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .etiquettes{display:flex; flex-wrap:wrap; gap:6px}
+    .etiquette{
+      font-size:11px; padding:3px 8px; border-radius:999px;
+      background:#f1f5f9; color:#0f172a; border:1px solid var(--bordure)
+    }
+    .etiquette.bleue{background:var(--bleu-50); color:#0b2b7a; border-color:color-mix(in oklab, var(--bleu) 25%, var(--bordure))}
+
+    /* ===========================
+       Détail (droite)
+       =========================== */
+    .panneau-detail{padding:14px}
+    .attente{
+      color:var(--atténué); font-size:14px; padding:28px;
+      border:2px dashed var(--bordure); border-radius:12px; background:#fafafa;
+      text-align:center;
+    }
+    .detail h2{margin:0 0 6px}
+    .detail .sous{color:var(--atténué); margin:0 0 12px}
+    .pastille{
+      display:inline-block; font-size:11px; padding:4px 8px; border-radius:999px;
+      background:#f1f5f9; border:1px solid var(--bordure); margin-right:6px; margin-bottom:6px;
+    }
+    .caracts{
+      width:100%; border-collapse:separate; border-spacing:0; margin:12px 0; font-size:13px;
+      border:1px solid var(--bordure); border-radius:10px; overflow:hidden;
+    }
+    .caracts th,.caracts td{padding:8px 10px; text-align:left; vertical-align:top; background:#fff}
+    .caracts th{width:160px; color:#0b2b7a; background:var(--bleu-50); font-weight:700; border-right:1px solid var(--bordure)}
+    .caracts tr+tr th, .caracts tr+tr td{border-top:1px solid var(--bordure)}
+    .notes{background:#fff7ed; border:1px solid #fed7aa; color:#7c2d12; padding:10px 12px; border-radius:10px}
+    .description{margin:10px 0 0; color:#111827}
+
+    /* ===========================
+       Pied de page (kaki)
+       =========================== */
+    footer{
+      margin-top:24px; background:var(--kaki); color:#0f1a12; text-align:center; padding:14px 10px; font-weight:700;
+      letter-spacing:.2px; border-top:1px solid color-mix(in oklab, black 10%, var(--kaki));
+    }
+  
+    /* ===========================
+       Recherche + À propos
+       =========================== */
+    .bloc-recherche{margin:6px 6px 12px; display:flex; flex-direction:column; gap:6px}
+    .lbl-recherche{font-size:12px; color:var(--atténué); font-weight:700}
+    #recherche-nom{
+      appearance:none; width:100%;
+      border:1px solid var(--bordure); border-radius:10px; padding:8px 10px; font-size:14px; background:#fff;
+      outline:none;
+    }
+    #recherche-nom:focus{
+      border-color:color-mix(in oklab, var(--bleu) 35%, var(--bordure));
+      box-shadow:0 0 0 3px color-mix(in oklab, var(--bleu) 20%, transparent);
+    }
+    footer details{max-width:1200px; margin:0 auto; text-align:left}
+    footer details>summary{cursor:pointer; font-weight:800; list-style:none}
+    footer details>summary::marker{display:none}
+    footer .contenu-apropos{padding:8px 0 0}
+    footer .contenu-apropos p{margin:6px 0}
+    footer a{color:#0b2b7a; text-decoration:none; border-bottom:1px dashed #0b2b7a}
+    footer a:hover{border-bottom-style:solid}
+
+  </style>
+</head>
+<body>
+  <header role="banner" aria-label="En-tête">
+    <div class="entete-interne">
+      <div class="marque">Catalogue <b>Régie</b> — Interface 3 panneaux</div>
+      <div class="indice" aria-hidden="true">Choisis une rubrique puis une carte pour afficher la fiche →</div>
+    </div>
+  </header>
+
+  <main class="grille" role="main">
+    <!-- =======================
+         Panneau gauche : Rubriques
+         ======================= -->
+    <aside class="panneau" aria-label="Rubriques">
+      <nav aria-label="Rubriques">
+        
+        <div class="bloc-recherche" role="search">
+          <label class="lbl-recherche" for="recherche-nom">Recherche</label>
+          <input type="search" id="recherche-nom" placeholder="Rechercher un équipement par nom…" autocomplete="off" aria-describedby="etat-recherche" />
+          <p id="etat-recherche" class="indice masqué" aria-live="polite"></p>
+        </div>
+<ul class="rubriques">
+          <li><button class="bouton-rubrique" type="button" data-cat="audio"><span class="emoji-rubrique">🔊</span> Audio</button></li>
+          <li><button class="bouton-rubrique" type="button" data-cat="video" aria-current="page"><span class="emoji-rubrique">🎥</span> Vidéo</button></li>
+          <li><button class="bouton-rubrique" type="button" data-cat="reseau"><span class="emoji-rubrique">🌐</span> Réseau</button></li>
+          <li><button class="bouton-rubrique" type="button" data-cat="monitoring"><span class="emoji-rubrique">🖥️</span> Monitoring</button></li>
+          <li><button class="bouton-rubrique" type="button" data-cat="cablerie"><span class="emoji-rubrique">🔌</span> Câblerie</button></li>
+          <li><button class="bouton-rubrique" type="button" data-cat="accessoires"><span class="emoji-rubrique">🧰</span> Accessoires</button></li>
+          <li><button class="bouton-rubrique" type="button" data-cat="plateau"><span class="emoji-rubrique">🎬</span> Plateau</button></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- =======================
+         Panneau centre : Listes
+         ======================= -->
+    <section class="panneau centre" aria-label="Liste d’équipements">
+      <!-- AUDIO -->
+      <div class="section-categorie masqué" data-cat="audio" role="region" aria-label="Audio — Liste">
+        <div class="cartes">
+
+          <!-- ANTMIX 12 FX -->
+          <button class="carte" type="button" data-id="antmix-12-fx" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">A</div>
+              <div class="grandit">
+                <h4 class="titre">ANTMIX 12 FX</h4>
+                <div class="soustitre">ANT · MIX 12 FX</div>
+                <div class="etiquettes"><span class="etiquette">table de mixage</span><span class="etiquette">audio</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>ANTMIX 12 FX</h2>
+                <p class="sous">Marque/Modèle · ANT · MIX 12 FX</p>
+                <div>
+                  <span class="pastille">table de mixage</span><span class="pastille">audio</span>
+                </div>
+                <table class="caracts">
+                  <tbody>
+                    <tr><th>Entrées</th><td>6 entrées XLR (à confirmer)</td></tr>
+                    <tr><th>Sorties</th><td>2 sorties XLR (à confirmer)</td></tr>
+                  </tbody>
+                </table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Petite console de mixage pour additionner plusieurs micros et sources ligne, ajuster niveaux/égalisation et envoyer un mix propre vers l’enregistreur, le plateau ou le diffuseur. Idéale pour un plateau simple ou un duplex téléphonique.</p>
+                <p class="notes"><strong>Notes :</strong> Gère les volumes par canal et fonctions « Mic on/off » (à confirmer selon version).</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- 2 Mix -->
+          <button class="carte" type="button" data-id="2-mix" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">2</div>
+              <div class="grandit">
+                <h4 class="titre">2 Mix</h4>
+                <div class="soustitre">Blackmagic Design</div>
+                <div class="etiquettes"><span class="etiquette">audio</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>2 Mix</h2>
+                <p class="sous">Marque · Blackmagic Design</p>
+                <div><span class="pastille">audio</span></div>
+                <table class="caracts">
+                  <tbody>
+                    <tr><th>Sorties</th><td>2 sorties XLR (à confirmer)</td></tr>
+                  </tbody>
+                </table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Boîtier simple pour regrouper 2 signaux vers un bus commun (ou distribuer). Utile pour envoyer un mix stéréo vers un enregistreur/retour. Dénomination et caractéristiques exactes à valider (référence peu standard).</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Codec Phone -->
+          <button class="carte" type="button" data-id="codec-phone" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">C</div>
+              <div class="grandit">
+                <h4 class="titre">Codec Phone</h4>
+                <div class="soustitre">ABC</div>
+                <div class="etiquettes"><span class="etiquette">codec</span><span class="etiquette">téléphone</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Codec Phone</h2>
+                <p class="sous">Marque · ABC</p>
+                <div><span class="pastille">codec</span><span class="pastille">téléphone</span></div>
+                <p class="description"><strong>À quoi ça sert ?</strong> Permet d’intégrer une intervention téléphonique à l’antenne/au plateau avec une qualité stabilisée (ligne hybride/VoIP). Indispensable pour interviews à distance. Modèle précis à confirmer.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Demux (SDI → Audio) -->
+          <button class="carte" type="button" data-id="demux-sdi-audio" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">D</div>
+              <div class="grandit">
+                <h4 class="titre">Demux (SDI → Audio)</h4>
+                <div class="soustitre">Blackmagic Design</div>
+                <div class="etiquettes"><span class="etiquette">désemboitage</span><span class="etiquette">sdi</span><span class="etiquette">audio</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Demux (SDI → Audio)</h2>
+                <p class="sous">Marque · Blackmagic Design</p>
+                <div><span class="pastille">désemboitage</span><span class="pastille">sdi</span><span class="pastille">audio</span></div>
+                <table class="caracts">
+                  <tbody>
+                    <tr><th>Sorties</th><td>2 sorties XLR + 2 sorties AES (à confirmer)</td></tr>
+                  </tbody>
+                </table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Récupère l’audio embarqué dans le SDI (« embedded ») et le sort en analogique/AES pour un mixer, un monitoring ou un enregistreur.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- the t.bone HPA6 -->
+          <button class="carte" type="button" data-id="the-tbone-hpa6" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">T</div>
+              <div class="grandit">
+                <h4 class="titre">the t.bone HPA6</h4>
+                <div class="soustitre">the t.bone · HPA6</div>
+                <div class="etiquettes"><span class="etiquette">ampli casque</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>the t.bone HPA6</h2>
+                <p class="sous">Marque/Modèle · the t.bone · HPA6</p>
+                <div><span class="pastille">ampli casque</span></div>
+                <table class="caracts">
+                  <tbody>
+                    <tr><th>Sorties</th><td>6 sorties casque (à confirmer)</td></tr>
+                  </tbody>
+                </table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Distribue un même mix casque vers plusieurs opérateurs/plateau, chacun réglant son volume. Très courant en studio.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Intercom centrale -->
+          <button class="carte" type="button" data-id="intercom-centrale" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">I</div>
+              <div class="grandit">
+                <h4 class="titre">Intercom centrale</h4>
+                <div class="soustitre">ATS (Options)</div>
+                <div class="etiquettes"><span class="etiquette">intercom</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Intercom centrale</h2>
+                <p class="sous">Marque · ATS (Options)</p>
+                <div><span class="pastille">intercom</span></div>
+                <p class="description"><strong>À quoi ça sert ?</strong> Cœur du système de communication technique (régie ↔ plateau, caméras, machinerie). Gère les groupes, le talkback et parfois le tally. Nombre exact de canaux/ports à confirmer.</p>
+                <p class="notes"><strong>Notes :</strong> « 9 only » mentionné à vérifier.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- POST Entrances ? -->
+          <button class="carte" type="button" data-id="post-entrances" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">P</div>
+              <div class="grandit">
+                <h4 class="titre">POST Entrances ?</h4>
+                <div class="soustitre">—</div>
+                <div class="etiquettes"><span class="etiquette">routing</span><span class="etiquette">sdi</span><span class="etiquette">audio</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>POST Entrances ?</h2>
+                <div><span class="pastille">routing</span><span class="pastille">sdi</span><span class="pastille">audio</span></div>
+                <table class="caracts">
+                  <tbody>
+                    <tr><th>Vidéo</th><td>SDI IN / SDI OUT (à confirmer)</td></tr>
+                    <tr><th>Audio</th><td>2 entrées XLR (à confirmer)</td></tr>
+                  </tbody>
+                </table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Élément supposé de distribution/retour post-prod ou patch. Référence à clarifier sur site.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Produit 4026 AV -->
+          <button class="carte" type="button" data-id="produit-4026-av" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">P</div>
+              <div class="grandit">
+                <h4 class="titre">Produit 4026 AV</h4>
+                <div class="soustitre">PLAYTRONIC</div>
+                <div class="etiquettes"><span class="etiquette">à confirmer</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Produit 4026 AV</h2>
+                <p class="sous">Marque · PLAYTRONIC</p>
+                <div><span class="pastille">à confirmer</span></div>
+                <table class="caracts">
+                  <tbody>
+                    <tr><th>Divers</th><td>HP (à confirmer)</td></tr>
+                  </tbody>
+                </table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Probable boîtier audio/vidéo (HP = haut-parleur ?). Détails exacts à vérifier physiquement.</p>
+              </div>
+            </article>
+          </button>
+        </div>
+      </div>
+
+      <!-- VIDEO (active par défaut) -->
+      <div class="section-categorie" data-cat="video" role="region" aria-label="Vidéo — Liste">
+        <div class="cartes">
+
+          <!-- Sony XVS-6000 -->
+          <button class="carte" type="button" data-id="sony-xvs-6000" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">S</div>
+              <div class="grandit">
+                <h4 class="titre">Sony XVS-6000</h4>
+                <div class="soustitre">Sony · XVS-6000</div>
+                <div class="etiquettes"><span class="etiquette bleue">mélangeur</span><span class="etiquette">réalisation</span><span class="etiquette">key</span><span class="etiquette">multicam</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Sony XVS-6000</h2>
+                <p class="sous">Mélangeur de production vidéo</p>
+                <div><span class="pastille">mélangeur</span><span class="pastille">réalisation</span><span class="pastille">key</span><span class="pastille">multicam</span></div>
+                <table class="caracts">
+                  <tbody>
+                    <tr><th>Entrées</th><td>Jusqu’à 80 (SDI/3G, option 12G-SDI)</td></tr>
+                    <tr><th>Sorties</th><td>Jusqu’à 32 (SDI/3G)</td></tr>
+                  </tbody>
+                </table>
+                <p class="description"><strong>À quoi ça sert ?</strong> C’est le cœur de la réalisation multicaméra : sélection des sources, transitions, incrustations (keys), effets et retours. Adapté aux plateaux TV et captations complexes.</p>
+                <p class="notes"><strong>Notes :</strong> Capacités d’entrées/sorties dépendantes des cartes installées.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Sony MKS-X7017 -->
+          <button class="carte" type="button" data-id="sony-mks-x7017" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">S</div>
+              <div class="grandit">
+                <h4 class="titre">Sony MKS-X7017 (Pupitre)</h4>
+                <div class="soustitre">Panneau de contrôle</div>
+                <div class="etiquettes"><span class="etiquette">panneau de contrôle</span><span class="etiquette">t-bar</span><span class="etiquette">surface</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Sony MKS-X7017 (Pupitre)</h2>
+                <p class="sous">Panel opérateur pour XVS-6000</p>
+                <div><span class="pastille">panneau de contrôle</span><span class="pastille">t-bar</span><span class="pastille">surface</span></div>
+                <table class="caracts">
+                  <tbody>
+                    <tr><th>Connexions</th><td>Ethernet vers XVS-6000</td></tr>
+                    <tr><th>I/O vidéo</th><td>Aucune</td></tr>
+                  </tbody>
+                </table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Console matérielle (boutons, T-bar) qui pilote le mélangeur pour des opérations rapides et fiables en direct.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Sony MKS-X7018 -->
+          <button class="carte" type="button" data-id="sony-mks-x7018" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">S</div>
+              <div class="grandit">
+                <h4 class="titre">Sony MKS-X7018 (Pupitre)</h4>
+                <div class="soustitre">Panneau de contrôle</div>
+                <div class="etiquettes"><span class="etiquette">panneau de contrôle</span><span class="etiquette">t-bar</span><span class="etiquette">surface</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Sony MKS-X7018 (Pupitre)</h2>
+                <p class="sous">Panel opérateur pour XVS-6000</p>
+                <div><span class="pastille">panneau de contrôle</span><span class="pastille">t-bar</span><span class="pastille">surface</span></div>
+                <table class="caracts"><tbody>
+                  <tr><th>Connexions</th><td>Ethernet vers XVS-6000</td></tr>
+                  <tr><th>I/O vidéo</th><td>Aucune</td></tr>
+                </tbody></table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Variante de panel pour disposer d’un autre format/ergonomie selon la réalisation.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Sony MKS-X7031 -->
+          <button class="carte" type="button" data-id="sony-mks-x7031" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">S</div>
+              <div class="grandit">
+                <h4 class="titre">Sony MKS-X7031 (Pupitre)</h4>
+                <div class="soustitre">Panneau de contrôle</div>
+                <div class="etiquettes"><span class="etiquette">panneau de contrôle</span><span class="etiquette">t-bar</span><span class="etiquette">surface</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Sony MKS-X7031 (Pupitre)</h2>
+                <p class="sous">Panel opérateur pour XVS-6000</p>
+                <div><span class="pastille">panneau de contrôle</span><span class="pastille">t-bar</span><span class="pastille">surface</span></div>
+                <table class="caracts"><tbody>
+                  <tr><th>Connexions</th><td>Ethernet vers XVS-6000</td></tr>
+                  <tr><th>I/O vidéo</th><td>Aucune</td></tr>
+                </tbody></table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Autre déclinaison de surface pour adapter la disposition des touches aux besoins du direct.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Sony MKS-X2920 -->
+          <button class="carte" type="button" data-id="sony-mks-x2920" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">S</div>
+              <div class="grandit">
+                <h4 class="titre">Sony MKS-X2920 (Interface)</h4>
+                <div class="soustitre">Interface panneaux / tally / GPI/O</div>
+                <div class="etiquettes"><span class="etiquette">interface</span><span class="etiquette">panneaux</span><span class="etiquette">tally</span><span class="etiquette">gpi</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Sony MKS-X2920</h2>
+                <p class="sous">Interface système</p>
+                <div><span class="pastille">interface</span><span class="pastille">panneaux</span><span class="pastille">tally</span><span class="pastille">gpi</span></div>
+                <table class="caracts"><tbody>
+                  <tr><th>Ports</th><td>Ethernet, série, GPI/O</td></tr>
+                  <tr><th>Rôle</th><td>Relie panels, tally et triggers GPI/O au mélangeur</td></tr>
+                </tbody></table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Hub de communication entre surfaces, système de voyants (tally) et automatisations (GPI/O).</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Blackmagic Audio Monitor 12G -->
+          <button class="carte" type="button" data-id="bmd-audio-monitor-12g" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">B</div>
+              <div class="grandit">
+                <h4 class="titre">Blackmagic Audio Monitor 12G</h4>
+                <div class="soustitre">Monitoring audio</div>
+                <div class="etiquettes"><span class="etiquette">monitoring audio</span><span class="etiquette">12G-SDI</span><span class="etiquette">désemboitage</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Blackmagic Audio Monitor 12G</h2>
+                <p class="sous">Unité de monitoring audio 12G</p>
+                <div><span class="pastille">monitoring audio</span><span class="pastille">12G-SDI</span><span class="pastille">désemboitage</span></div>
+                <table class="caracts"><tbody>
+                  <tr><th>Entrées</th><td>12G-SDI, AES/EBU, XLR/RCA</td></tr>
+                  <tr><th>Sorties</th><td>SDI loop, casque, HP</td></tr>
+                </tbody></table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Écoute et contrôle du niveau/phase de l’audio, venant soit du SDI soit d’entrées audio dédiées.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Blackmagic SmartView 4K -->
+          <button class="carte" type="button" data-id="bmd-smartview-4k" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">B</div>
+              <div class="grandit">
+                <h4 class="titre">Blackmagic SmartView 4K</h4>
+                <div class="soustitre">Écran de monitoring</div>
+                <div class="etiquettes"><span class="etiquette">écran</span><span class="etiquette">monitoring</span><span class="etiquette">12G-SDI</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Blackmagic SmartView 4K</h2>
+                <p class="sous">Moniteur 4K pour sources SDI</p>
+                <div><span class="pastille">écran</span><span class="pastille">monitoring</span><span class="pastille">12G-SDI</span></div>
+                <table class="caracts"><tbody>
+                  <tr><th>Entrées</th><td>2× 12G-SDI (boucle)</td></tr>
+                  <tr><th>Contrôle</th><td>Ethernet</td></tr>
+                </tbody></table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Affiche les retours de caméras/PGM en très faible latence, jusqu’en 4K via 12G-SDI.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Teranex Mini – Audio to SDI -->
+          <button class="carte" type="button" data-id="bmd-teranex-audio-to-sdi" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">B</div>
+              <div class="grandit">
+                <h4 class="titre">Teranex Mini – Audio → SDI</h4>
+                <div class="soustitre">Convertisseur « embed »</div>
+                <div class="etiquettes"><span class="etiquette">convertisseur</span><span class="etiquette">embed</span><span class="etiquette">audio</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Teranex Mini — Audio → SDI</h2>
+                <p class="sous">Blackmagic Design</p>
+                <div><span class="pastille">convertisseur</span><span class="pastille">embed</span><span class="pastille">audio</span></div>
+                <table class="caracts"><tbody>
+                  <tr><th>Entrées</th><td>Audio analogique/AES</td></tr>
+                  <tr><th>Sorties</th><td>12G-SDI (audio embarqué)</td></tr>
+                </tbody></table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Injecte (embarque) une piste audio externe dans un flux SDI pour acheminer audio+vidéo ensemble.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Teranex Mini – SDI to HDMI -->
+          <button class="carte" type="button" data-id="bmd-teranex-sdi-to-hdmi" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">B</div>
+              <div class="grandit">
+                <h4 class="titre">Teranex Mini – SDI → HDMI</h4>
+                <div class="soustitre">Convertisseur monitoring</div>
+                <div class="etiquettes"><span class="etiquette">convertisseur</span><span class="etiquette">monitoring</span><span class="etiquette">hdmi</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Teranex Mini — SDI → HDMI</h2>
+                <p class="sous">Blackmagic Design</p>
+                <div><span class="pastille">convertisseur</span><span class="pastille">monitoring</span><span class="pastille">hdmi</span></div>
+                <table class="caracts"><tbody>
+                  <tr><th>Entrées</th><td>12G-SDI</td></tr>
+                  <tr><th>Sorties</th><td>HDMI + boucle SDI</td></tr>
+                </tbody></table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Affiche une source SDI sur un écran/TV HDMI, pratique en contrôle local.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Teranex Mini – SDI to Audio -->
+          <button class="carte" type="button" data-id="bmd-teranex-sdi-to-audio" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">B</div>
+              <div class="grandit">
+                <h4 class="titre">Teranex Mini – SDI → Audio</h4>
+                <div class="soustitre">Convertisseur « de-embed »</div>
+                <div class="etiquettes"><span class="etiquette">convertisseur</span><span class="etiquette">de-embed</span><span class="etiquette">audio</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Teranex Mini — SDI → Audio</h2>
+                <p class="sous">Blackmagic Design</p>
+                <div><span class="pastille">convertisseur</span><span class="pastille">de-embed</span><span class="pastille">audio</span></div>
+                <table class="caracts"><tbody>
+                  <tr><th>Entrées</th><td>12G-SDI</td></tr>
+                  <tr><th>Sorties</th><td>XLR/AES (audio dé-embarqué)</td></tr>
+                </tbody></table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Sépare (dé-embarque) l’audio du SDI pour traitement/monitoring indépendant.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Teranex Mini – SDI to Analog -->
+          <button class="carte" type="button" data-id="bmd-teranex-sdi-to-analog" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">B</div>
+              <div class="grandit">
+                <h4 class="titre">Teranex Mini – SDI → Analogique</h4>
+                <div class="soustitre">Convertisseur analogique</div>
+                <div class="etiquettes"><span class="etiquette">convertisseur</span><span class="etiquette">analogique</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Teranex Mini — SDI → Analogique</h2>
+                <p class="sous">Blackmagic Design</p>
+                <div><span class="pastille">convertisseur</span><span class="pastille">analogique</span></div>
+                <table class="caracts"><tbody>
+                  <tr><th>Entrées</th><td>12G-SDI</td></tr>
+                  <tr><th>Sorties</th><td>Vidéo/Audio analogiques</td></tr>
+                </tbody></table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Alimente un moniteur/équipement analogique à partir d’un signal SDI moderne.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- HyperDeck Studio Mini -->
+          <button class="carte" type="button" data-id="bmd-hyperdeck-studio-mini" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">B</div>
+              <div class="grandit">
+                <h4 class="titre">HyperDeck Studio Mini</h4>
+                <div class="soustitre">Enregistreur / Playout</div>
+                <div class="etiquettes"><span class="etiquette">enregistreur</span><span class="etiquette">playout</span><span class="etiquette">secours</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>HyperDeck Studio Mini</h2>
+                <p class="sous">Blackmagic Design</p>
+                <div><span class="pastille">enregistreur</span><span class="pastille">playout</span><span class="pastille">secours</span></div>
+                <table class="caracts"><tbody>
+                  <tr><th>Vidéo</th><td>SDI 6G I/O, HDMI</td></tr>
+                  <tr><th>Audio</th><td>AES/analogiques</td></tr>
+                  <tr><th>Support</th><td>Cartes SD</td></tr>
+                </tbody></table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Enregistre les flux PGM/ISO et relit des habillages/PA. Format compact pour la baie technique.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- AJA Io IP -->
+          <button class="carte" type="button" data-id="aja-io-ip" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">A</div>
+              <div class="grandit">
+                <h4 class="titre">AJA Io IP</h4>
+                <div class="soustitre">Passerelle IP</div>
+                <div class="etiquettes"><span class="etiquette">ip</span><span class="etiquette">st2110</span><span class="etiquette">passerelle</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>AJA Io IP</h2>
+                <p class="sous">Interface régie ↔ IP</p>
+                <div><span class="pastille">ip</span><span class="pastille">st2110</span><span class="pastille">passerelle</span></div>
+                <table class="caracts"><tbody>
+                  <tr><th>Standards</th><td>SMPTE 2022/2110</td></tr>
+                  <tr><th>I/O</th><td>Audio/Vidéo sur IP</td></tr>
+                </tbody></table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Convertit des signaux SDI/HDMI vers IP et inversement pour intégrer la régie dans un réseau de production IP.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- AJA Hi5-4K-Plus -->
+          <button class="carte" type="button" data-id="aja-hi5-4k-plus" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">A</div>
+              <div class="grandit">
+                <h4 class="titre">AJA Hi5-4K-Plus</h4>
+                <div class="soustitre">SDI → HDMI 2.0</div>
+                <div class="etiquettes"><span class="etiquette">convertisseur</span><span class="etiquette">4K</span><span class="etiquette">HDMI</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>AJA Hi5-4K-Plus</h2>
+                <p class="sous">Convertisseur SDI vers HDMI</p>
+                <div><span class="pastille">convertisseur</span><span class="pastille">4K</span><span class="pastille">HDMI</span></div>
+                <table class="caracts"><tbody>
+                  <tr><th>Entrées</th><td>4× 3G-SDI (quad) ou 12G-SDI</td></tr>
+                  <tr><th>Sortie</th><td>HDMI 2.0</td></tr>
+                </tbody></table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Affiche un flux 4K SDI (quad-link ou 12G) sur un moniteur HDMI 2.0.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Tektronix WFM-1600R -->
+          <button class="carte" type="button" data-id="tektronix-wfm-1600r" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">T</div>
+              <div class="grandit">
+                <h4 class="titre">Tektronix WFM-1600R</h4>
+                <div class="soustitre">Waveform / Vectorscope</div>
+                <div class="etiquettes"><span class="etiquette">waveform</span><span class="etiquette">vectorscope</span><span class="etiquette">analyse</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Tektronix WFM-1600R</h2>
+                <p class="sous">Analyse SDI</p>
+                <div><span class="pastille">waveform</span><span class="pastille">vectorscope</span><span class="pastille">analyse</span></div>
+                <table class="caracts"><tbody>
+                  <tr><th>Entrées</th><td>SD/HD/3G-SDI</td></tr>
+                  <tr><th>Sorties</th><td>Boucle SDI</td></tr>
+                </tbody></table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Mesure la luminance, la chroma et la synchronisation pour caler exposition, gamut et conformité broadcast.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Telestream SPG700 -->
+          <button class="carte" type="button" data-id="telestream-spg700" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">T</div>
+              <div class="grandit">
+                <h4 class="titre">Telestream SPG700</h4>
+                <div class="soustitre">Générateur de synchro</div>
+                <div class="etiquettes"><span class="etiquette">générateur de synchro</span><span class="etiquette">référence</span><span class="etiquette">clock</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Telestream SPG700</h2>
+                <p class="sous">Référence vidéo/clock</p>
+                <div><span class="pastille">générateur de synchro</span><span class="pastille">référence</span><span class="pastille">clock</span></div>
+                <table class="caracts"><tbody>
+                  <tr><th>Sorties</th><td>Black burst, Tri-level, 3G/HD/SD</td></tr>
+                  <tr><th>Référence externe</th><td>Oui</td></tr>
+                </tbody></table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Fournit la référence commune de timing pour éviter les sauts/accroches lors des commutations.</p>
+              </div>
+            </article>
+          </button>
+
+          <!-- Sony HD CCU -->
+          <button class="carte" type="button" data-id="sony-hd-ccu" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">S</div>
+              <div class="grandit">
+                <h4 class="titre">Sony HD CCU</h4>
+                <div class="soustitre">Unité de contrôle caméra</div>
+                <div class="etiquettes"><span class="etiquette">ccu</span><span class="etiquette">caméra</span><span class="etiquette">plateau</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Sony HD CCU</h2>
+                <p class="sous">Unité de contrôle</p>
+                <div><span class="pastille">ccu</span><span class="pastille">caméra</span><span class="pastille">plateau</span></div>
+                <table class="caracts"><tbody>
+                  <tr><th>Entrée</th><td>Fibre caméra</td></tr>
+                  <tr><th>Sorties</th><td>SDI PGM/Preview, tally, intercom</td></tr>
+                </tbody></table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Alimente et pilote la caméra studio (peaking, iris, gain) et retourne les signaux vers la régie avec intercom/tally.</p>
+              </div>
+            </article>
+          </button>
+        </div>
+      </div>
+
+      <!-- RESEAU -->
+      <div class="section-categorie masqué" data-cat="reseau" role="region" aria-label="Réseau — Liste">
+        <div class="cartes">
+          <button class="carte" type="button" data-id="netgear-prosafe-jgs516pe" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">N</div>
+              <div class="grandit">
+                <h4 class="titre">Netgear ProSAFE JGS516PE</h4>
+                <div class="soustitre">Switch administrable</div>
+                <div class="etiquettes"><span class="etiquette">switch</span><span class="etiquette">poe</span><span class="etiquette">réseau régie</span></div>
+              </div>
+            </div>
+            <article class="detail masqué">
+              <div class="detail">
+                <h2>Netgear ProSAFE JGS516PE</h2>
+                <p class="sous">Switch 16 ports</p>
+                <div><span class="pastille">switch</span><span class="pastille">poe</span><span class="pastille">réseau régie</span></div>
+                <table class="caracts"><tbody>
+                  <tr><th>Ports</th><td>16× 1G (dont 8 PoE)</td></tr>
+                  <tr><th>Gestion</th><td>Administrable</td></tr>
+                </tbody></table>
+                <p class="description"><strong>À quoi ça sert ?</strong> Relie l’ensemble des équipements IP (contrôle, VSM, interphonie IP, tally IP) et alimente certains périphériques via PoE.</p>
+                <p class="notes"><strong>Notes :</strong> Usage typique en réseau interne de régie.</p>
+              </div>
+            </article>
+          </button>
+        </div>
+      </div>
+
+      <!-- MONITORING -->
+      <div class="section-categorie masqué" data-cat="monitoring" role="region" aria-label="Monitoring — Liste">
+        <div class="cartes">
+          <button class="carte" type="button" data-id="lawo-vsm" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">L</div>
+              <div class="grandit">
+                <h4 class="titre">Lawo VSM</h4>
+                <div class="soustitre">Supervision / Contrôle centralisé</div>
+                <div class="etiquettes"><span class="etiquette">supervision</span><span class="etiquette">contrôle centralisé</span><span class="etiquette">routing</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>Lawo VSM</h2>
+              <p class="sous">Contrôle IP des équipements connectés</p>
+              <div><span class="pastille">supervision</span><span class="pastille">contrôle centralisé</span><span class="pastille">routing</span></div>
+              <table class="caracts"><tbody>
+                <tr><th>Contrôle</th><td>IP sur équipements connectés</td></tr>
+                <tr><th>Fonctions</th><td>Routing, monitoring, tally</td></tr>
+              </tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Pilote et supervise à distance matrices, multiviewers, intercoms et signaux, via interfaces logicielles.</p>
+              <p class="notes"><strong>Notes :</strong> Solution logicielle/serveur, pas forcément un boîtier unique.</p>
+            </div></article>
+          </button>
+
+          <button class="carte" type="button" data-id="hp-elitedesk" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">H</div>
+              <div class="grandit">
+                <h4 class="titre">HP EliteDesk</h4>
+                <div class="soustitre">Station / Automatisation</div>
+                <div class="etiquettes"><span class="etiquette">station</span><span class="etiquette">automation</span><span class="etiquette">gestion</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>HP EliteDesk</h2>
+              <p class="sous">PC de contrôle</p>
+              <div><span class="pastille">station</span><span class="pastille">automation</span><span class="pastille">gestion</span></div>
+              <table class="caracts"><tbody><tr><th>I/O</th><td>USB, Ethernet, HDMI/DP</td></tr></tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Machine dédiée aux logiciels de contrôle/automation, supervision ou diffusion d’assets.</p>
+            </div></article>
+          </button>
+
+          <button class="carte" type="button" data-id="hp-z400" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">H</div>
+              <div class="grandit">
+                <h4 class="titre">HP Z400</h4>
+                <div class="soustitre">Workstation / Traitement média</div>
+                <div class="etiquettes"><span class="etiquette">workstation</span><span class="etiquette">traitement média</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>HP Z400</h2>
+              <p class="sous">Station de travail</p>
+              <div><span class="pastille">workstation</span><span class="pastille">traitement média</span></div>
+              <table class="caracts"><tbody><tr><th>I/O</th><td>USB, Ethernet, HDMI/DP</td></tr></tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Postes puissants pour encodage, transcodage, contrôle graphique ou serveurs locaux.</p>
+            </div></article>
+          </button>
+
+          <button class="carte" type="button" data-id="sony-pws-1100" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">S</div>
+              <div class="grandit">
+                <h4 class="titre">Sony PWS-1100</h4>
+                <div class="soustitre">Serveur passerelle / traitement</div>
+                <div class="etiquettes"><span class="etiquette">serveur</span><span class="etiquette">ip</span><span class="etiquette">production</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>Sony PWS-1100</h2>
+              <p class="sous">Serveur de production</p>
+              <div><span class="pastille">serveur</span><span class="pastille">ip</span><span class="pastille">production</span></div>
+              <table class="caracts"><tbody><tr><th>I/O</th><td>IP/SDI selon configuration</td></tr></tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Nodal de traitement/ingest/échange entre environnements SDI et IP selon les cartes installées.</p>
+            </div></article>
+          </button>
+        </div>
+      </div>
+
+      <!-- CABLERIE -->
+      <div class="section-categorie masqué" data-cat="cablerie" role="region" aria-label="Câblerie — Liste">
+        <div class="cartes">
+          <button class="carte" type="button" data-id="fibre-optique-ccu" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">F</div>
+              <div class="grandit">
+                <h4 class="titre">Fibre optique (CCU ↔ caméras)</h4>
+                <div class="soustitre">Liaison caméra</div>
+                <div class="etiquettes"><span class="etiquette">fibre</span><span class="etiquette">caméra</span><span class="etiquette">ccu</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>Fibre optique (CCU ↔ caméras)</h2>
+              <div><span class="pastille">fibre</span><span class="pastille">caméra</span><span class="pastille">ccu</span></div>
+              <table class="caracts"><tbody>
+                <tr><th>Usage</th><td>Liaison caméra studio longue distance</td></tr>
+                <tr><th>Type</th><td>Fibre (alimentation/signal via CCU)</td></tr>
+              </tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Transporte vidéo, intercom, tally et parfois alimentation entre plateau et CCU.</p>
+            </div></article>
+          </button>
+
+          <button class="carte" type="button" data-id="sdi-12g" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">S</div>
+              <div class="grandit">
+                <h4 class="titre">SDI / 12G-SDI</h4>
+                <div class="soustitre">Liaison vidéo interne</div>
+                <div class="etiquettes"><span class="etiquette">sdi</span><span class="etiquette">12g</span><span class="etiquette">vidéo</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>SDI / 12G-SDI</h2>
+              <div><span class="pastille">sdi</span><span class="pastille">12g</span><span class="pastille">vidéo</span></div>
+              <table class="caracts"><tbody>
+                <tr><th>Usage</th><td>Liaisons vidéo professionnelles</td></tr>
+                <tr><th>Formats</th><td>SD/HD/3G/12G</td></tr>
+              </tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Standard broadcast fiable, faible latence, verrouillage en timing centralisé.</p>
+            </div></article>
+          </button>
+
+          <button class="carte" type="button" data-id="xlr-aes" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">X</div>
+              <div class="grandit">
+                <h4 class="titre">XLR / AES</h4>
+                <div class="soustitre">Liaisons audio pro</div>
+                <div class="etiquettes"><span class="etiquette">audio</span><span class="etiquette">xlr</span><span class="etiquette">aes</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>XLR / AES</h2>
+              <div><span class="pastille">audio</span><span class="pastille">xlr</span><span class="pastille">aes</span></div>
+              <table class="caracts"><tbody>
+                <tr><th>Usage</th><td>Transport analogique pro & AES/EBU</td></tr>
+                <tr><th>Caractéristiques</th><td>Symétrique, robuste et blindé</td></tr>
+              </tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Connectique standard pour micros, retours et liaisons numériques AES entre appareils.</p>
+            </div></article>
+          </button>
+
+          <button class="carte" type="button" data-id="hdmi" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">H</div>
+              <div class="grandit">
+                <h4 class="titre">HDMI</h4>
+                <div class="soustitre">Monitoring local</div>
+                <div class="etiquettes"><span class="etiquette">hdmi</span><span class="etiquette">monitoring</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>HDMI</h2>
+              <div><span class="pastille">hdmi</span><span class="pastille">monitoring</span></div>
+              <table class="caracts"><tbody>
+                <tr><th>Usage</th><td>Écrans locaux/consommateur</td></tr>
+                <tr><th>Compatibilité</th><td>HD/4K selon versions</td></tr>
+              </tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Pratique sur moniteurs grand public proches de la régie via convertisseurs SDI↔HDMI.</p>
+            </div></article>
+          </button>
+
+          <button class="carte" type="button" data-id="patch-panels" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">P</div>
+              <div class="grandit">
+                <h4 class="titre">Patch panels (baie technique)</h4>
+                <div class="soustitre">Redirection / Baie</div>
+                <div class="etiquettes"><span class="etiquette">patch</span><span class="etiquette">baie</span><span class="etiquette">routing</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>Patch panels (baie technique)</h2>
+              <div><span class="pastille">patch</span><span class="pastille">baie</span><span class="pastille">routing</span></div>
+              <table class="caracts"><tbody>
+                <tr><th>Usage</th><td>Redirection des signaux (SDI/XLR/éthernet)</td></tr>
+                <tr><th>Montage</th><td>Baie 19″</td></tr>
+              </tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Facilite les reconfigurations et dépannages sans démonter la baie.</p>
+            </div></article>
+          </button>
+        </div>
+      </div>
+
+      <!-- ACCESSOIRES -->
+      <div class="section-categorie masqué" data-cat="accessoires" role="region" aria-label="Accessoires — Liste">
+        <div class="cartes">
+          <button class="carte" type="button" data-id="hp-usb-slim-keyboard" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">H</div>
+              <div class="grandit">
+                <h4 class="titre">HP USB Slim Keyboard</h4>
+                <div class="soustitre">Clavier opérateur</div>
+                <div class="etiquettes"><span class="etiquette">clavier</span><span class="etiquette">usb</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>HP USB Slim Keyboard</h2>
+              <div><span class="pastille">clavier</span><span class="pastille">usb</span></div>
+              <table class="caracts"><tbody><tr><th>Type</th><td>Clavier opérateur</td></tr></tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Entrées clavier fiables pour serveurs, automation et machines de pilotage.</p>
+            </div></article>
+          </button>
+
+          <button class="carte" type="button" data-id="kit-micro-hf-digicom-pro" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">K</div>
+              <div class="grandit">
+                <h4 class="titre">Kit micro HF Digicom Pro</h4>
+                <div class="soustitre">Micro HF</div>
+                <div class="etiquettes"><span class="etiquette">micro</span><span class="etiquette">hf</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>Kit micro HF Digicom Pro</h2>
+              <div><span class="pastille">micro</span><span class="pastille">hf</span></div>
+              <table class="caracts"><tbody><tr><th>Type</th><td>Liaison sans fil UHF/2,4 GHz (selon modèle)</td></tr></tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Sonorise présentateurs/invités sans câble, via récepteurs en régie.</p>
+            </div></article>
+          </button>
+
+          <button class="carte" type="button" data-id="logitech-hd-usb" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">L</div>
+              <div class="grandit">
+                <h4 class="titre">Logitech HD (USB)</h4>
+                <div class="soustitre">Webcam / USB</div>
+                <div class="etiquettes"><span class="etiquette">webcam</span><span class="etiquette">usb</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>Logitech HD (USB)</h2>
+              <div><span class="pastille">webcam</span><span class="pastille">usb</span></div>
+              <table class="caracts"><tbody><tr><th>Type</th><td>Caméra USB pour retours visio/monitoring</td></tr></tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Utilitaire pour retours, streaming secondaire ou contrôle distant.</p>
+            </div></article>
+          </button>
+
+          <button class="carte" type="button" data-id="telecommande-lumiere-ma" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">T</div>
+              <div class="grandit">
+                <h4 class="titre">Télécommande lumière (MA Lighting)</h4>
+                <div class="soustitre">DMX / ArtNet</div>
+                <div class="etiquettes"><span class="etiquette">lumière</span><span class="etiquette">dmx</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>Télécommande lumière (MA Lighting)</h2>
+              <div><span class="pastille">lumière</span><span class="pastille">dmx</span></div>
+              <table class="caracts"><tbody>
+                <tr><th>Protocoles</th><td>DMX/ArtNet</td></tr>
+              </tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Pilote des projecteurs et régies lumière depuis la régie technique.</p>
+            </div></article>
+          </button>
+
+          <button class="carte" type="button" data-id="ecrans-retour-sony" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">É</div>
+              <div class="grandit">
+                <h4 class="titre">Écrans de retour plateau (Sony)</h4>
+                <div class="soustitre">HDMI / SDI via conv.</div>
+                <div class="etiquettes"><span class="etiquette">retour</span><span class="etiquette">écran</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>Écrans de retour plateau (Sony)</h2>
+              <div><span class="pastille">retour</span><span class="pastille">écran</span></div>
+              <table class="caracts"><tbody>
+                <tr><th>Entrées</th><td>HDMI / SDI via convertisseur</td></tr>
+              </tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Permet aux intervenants de voir le PGM, un prompteur ou des décomptes.</p>
+            </div></article>
+          </button>
+        </div>
+      </div>
+
+      <!-- PLATEAU -->
+      <div class="section-categorie masqué" data-cat="plateau" role="region" aria-label="Plateau — Liste">
+        <div class="cartes">
+          <button class="carte" type="button" data-id="cameras-sony-x4" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">C</div>
+              <div class="grandit">
+                <h4 class="titre">Caméras Sony (x4)</h4>
+                <div class="soustitre">Fibre → CCU</div>
+                <div class="etiquettes"><span class="etiquette">caméras</span><span class="etiquette">plateau</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>Caméras Sony (x4)</h2>
+              <div><span class="pastille">caméras</span><span class="pastille">plateau</span></div>
+              <table class="caracts"><tbody><tr><th>Liaison</th><td>Fibre → CCU</td></tr></tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Prise de vues studio reliée en fibre à la régie : alimentation, intercom, tally et vidéo transitent ensemble.</p>
+            </div></article>
+          </button>
+
+          <button class="carte" type="button" data-id="projecteurs-arri-x26" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">P</div>
+              <div class="grandit">
+                <h4 class="titre">Projecteurs ARRI (x26)</h4>
+                <div class="soustitre">Secteur / DMX</div>
+                <div class="etiquettes"><span class="etiquette">éclairage</span><span class="etiquette">arri</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>Projecteurs ARRI (x26)</h2>
+              <div><span class="pastille">éclairage</span><span class="pastille">arri</span></div>
+              <table class="caracts"><tbody>
+                <tr><th>Alimentation</th><td>Secteur</td></tr>
+                <tr><th>Contrôle</th><td>DMX</td></tr>
+              </tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Éclaire le plateau avec des sources cinéma/TV de haute qualité, contrôlées en DMX.</p>
+            </div></article>
+          </button>
+
+          <button class="carte" type="button" data-id="televiseurs-sony-x2" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">T</div>
+              <div class="grandit">
+                <h4 class="titre">Téléviseurs Sony (x2)</h4>
+                <div class="soustitre">HDMI / SDI via conv.</div>
+                <div class="etiquettes"><span class="etiquette">retour</span><span class="etiquette">écran</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>Téléviseurs Sony (x2)</h2>
+              <div><span class="pastille">retour</span><span class="pastille">écran</span></div>
+              <table class="caracts"><tbody><tr><th>Entrées</th><td>HDMI / SDI via convertisseur</td></tr></tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Moniteurs retour pour le public, le plateau ou le contrôle décor.</p>
+            </div></article>
+          </button>
+
+          <button class="carte" type="button" data-id="enceintes-ma120-mkii-ampli" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">E</div>
+              <div class="grandit">
+                <h4 class="titre">Enceintes MA120 MKII + ampli</h4>
+                <div class="soustitre">Retour son</div>
+                <div class="etiquettes"><span class="etiquette">audio</span><span class="etiquette">retour</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>Enceintes MA120 MKII + ampli</h2>
+              <div><span class="pastille">audio</span><span class="pastille">retour</span></div>
+              <table class="caracts"><tbody>
+                <tr><th>Entrées</th><td>XLR/Jack</td></tr>
+                <tr><th>Usage</th><td>Retour son plateau</td></tr>
+              </tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Diffuse le mix ou un retour spécifique pour les comédiens/animateurs.</p>
+            </div></article>
+          </button>
+
+          <button class="carte" type="button" data-id="micros-hf-filaires" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">M</div>
+              <div class="grandit">
+                <h4 class="titre">Micros (x2 HF + x2 filaires)</h4>
+                <div class="soustitre">XLR / HF → récepteurs régie</div>
+                <div class="etiquettes"><span class="etiquette">micro</span><span class="etiquette">plateau</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>Micros (x2 HF + x2 filaires)</h2>
+              <div><span class="pastille">micro</span><span class="pastille">plateau</span></div>
+              <table class="caracts"><tbody><tr><th>Connexions</th><td>XLR / HF → récepteurs régie</td></tr></tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Capture des voix sur le plateau avec ou sans fil, selon la mobilité souhaitée.</p>
+            </div></article>
+          </button>
+
+          <button class="carte" type="button" data-id="pupitre-lumiere-ma" aria-pressed="false">
+            <div class="ligne-carte">
+              <div class="avatar">P</div>
+              <div class="grandit">
+                <h4 class="titre">Pupitre lumière (MA Lighting)</h4>
+                <div class="soustitre">DMX / ArtNet</div>
+                <div class="etiquettes"><span class="etiquette">lumière</span><span class="etiquette">contrôle</span></div>
+              </div>
+            </div>
+            <article class="detail masqué"><div class="detail">
+              <h2>Pupitre lumière (MA Lighting)</h2>
+              <div><span class="pastille">lumière</span><span class="pastille">contrôle</span></div>
+              <table class="caracts"><tbody><tr><th>Protocoles</th><td>DMX/ArtNet</td></tr></tbody></table>
+              <p class="description"><strong>À quoi ça sert ?</strong> Console principale de contrôle lumière pour créer des ambiances et mémoires.</p>
+            </div></article>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================
+         Panneau droite : Détail
+         ======================= -->
+    <aside class="panneau panneau-detail" id="panneau-detail" aria-label="Fiche équipement">
+      <div id="contenu-detail" class="attente">Sélectionnez un équipement…</div>
+    </aside>
+  </main>
+
+  <footer>
+    <details class="apropos">
+      <summary>À propos de ce site</summary>
+      <div class="contenu-apropos">
+        <p>Ce site a pris environ neuf heures à être construit. Il reste imparfait&nbsp;: merci d’être tolérant·e avec moi‑même.</p>
+        <p>Un jour, Karim a croisé un verre de lait‑fraise très aimable et une bande de fraises Tagada un brin turbulentes.</p>
+        <p>Nous avons alors monté l’opération <em>Mission Monnaert</em>&nbsp;: livrer ces douceurs à M.&nbsp;Monnaert, notre professeur, sans rien égarer en route.</p>
+        <p>Le trajet fut digne d’un film d’action (moins les explosions)&nbsp;; oui, nous avons goûté une ou deux friandises… pour le contrôle qualité.</p>
+        <p>Au final, la livraison a bien été effectuée, et le sourire de M.&nbsp;Monnaert valait bien toutes ces péripéties.</p>
+        <div class="licence-cc">
+          <p><strong>Licence&nbsp;:</strong> Ce travail est sous licence
+            <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr" rel="license noopener" target="_blank">Creative Commons BY‑NC‑ND 4.0</a>
+            (attribution, non‑commercial, pas de modifications). Pour toute autre utilisation, merci de contacter Karim.</p>
+        </div>
+        <p class="credit">Développé avec 🤍 par Karim Hamidou — alimenté au lait‑fraise et aux fraises Tagada.</p>
+      </div>
+    </details>
+  </footer>
+
+  <script>
+    /* =====================================================
+       JS minimal — tout en français, avec ARIA et animations
+       ===================================================== */
+    (function(){
+      const $ = (sel, ctx=document)=>ctx.querySelector(sel);
+      const $$ = (sel, ctx=document)=>Array.from(ctx.querySelectorAll(sel));
+
+      const sections = $$('.section-categorie');
+      const boutonsRubrique = $$('.bouton-rubrique');
+      const zoneCentre = $('.centre');
+      const detail = $('#contenu-detail');
+
+      // ——— Recherche par nom ———
+      const champRecherche = $('#recherche-nom');
+      const messageRecherche = $('#etat-recherche');
+
+      function appliquerFiltre(){
+        const q = (champRecherche && champRecherche.value || '').trim().toLowerCase();
+        const sectionActive = $('.section-categorie:not(.masqué)');
+        if(!sectionActive) return;
+        const cartes = $$('.carte', sectionActive);
+        let visibles = 0;
+        cartes.forEach(carte=>{
+          const titre = ($('.titre', carte)?.textContent || '').toLowerCase();
+          const sous = ($('.soustitre', carte)?.textContent || '').toLowerCase();
+          const ident = (carte.dataset.id || '').toLowerCase();
+          const ok = !q || titre.includes(q) || sous.includes(q) || ident.includes(q);
+          carte.classList.toggle('masqué', !ok);
+          if(ok) visibles++;
+        });
+        if(messageRecherche){
+          if(q && visibles === 0){
+            messageRecherche.textContent = 'Aucun résultat';
+            messageRecherche.classList.remove('masqué');
+          }else if(q){
+            messageRecherche.textContent = `${visibles} résultat${visibles>1?'s':''}`;
+            messageRecherche.classList.remove('masqué');
+          }else{
+            messageRecherche.classList.add('masqué');
+          }
+        }
+      }
+
+      champRecherche && champRecherche.addEventListener('input', appliquerFiltre);
+
+
+      // Ajoute une petite animation de fondu
+      function animeFondu(el){
+        if(!el) return;
+        el.classList.remove('anime-fondu'); // réarmement
+        // force le reflow pour relancer l’animation
+        void el.offsetWidth;
+        el.classList.add('anime-fondu');
+      }
+
+      // Réinitialise l’état sélectionné des cartes
+      function reinitialiseCartes(){
+        $$('.carte[aria-pressed="true"]').forEach(c=>c.setAttribute('aria-pressed','false'));
+      }
+
+      // Affiche le message d’attente dans le panneau de droite
+      function afficheAttente(){
+        detail.className = 'attente';
+        detail.textContent = 'Sélectionnez un équipement…';
+        animeFondu(detail);
+      }
+
+      // Bascule de catégorie avec masquage/affichage
+      function basculeCategorie(cat){
+        sections.forEach(sec=>{
+          const cible = sec.dataset.cat === cat;
+          if(cible){
+            sec.classList.remove('masqué');
+            animeFondu(sec);
+          }else{
+            sec.classList.add('masqué');
+          }
+        });
+      }
+
+      // Gestion des clics sur rubriques
+      boutonsRubrique.forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          // aria-current
+          boutonsRubrique.forEach(b=>b.removeAttribute('aria-current'));
+          btn.setAttribute('aria-current','page');
+
+          // montre la section correspondante
+          const cat = btn.dataset.cat;
+          basculeCategorie(cat);
+          appliquerFiltre();
+
+          // réinitialise la fiche et la sélection
+          reinitialiseCartes();
+          afficheAttente();
+          appliquerFiltre();
+
+          // place le focus accessibilité sur la première carte de la catégorie
+          const premiereCarte = $('.carte', $(`.section-categorie[data-cat="${cat}"]`));
+          if(premiereCarte) premiereCarte.focus({preventScroll:false});
+        });
+      });
+
+      // Délégation : clic sur une carte => copie le bloc <article.detail> vers le panneau de droite
+      zoneCentre.addEventListener('click', (e)=>{
+        const carte = e.target.closest('.carte');
+        if(!carte) return;
+
+        // ignore si section masquée (sécurité)
+        const sec = carte.closest('.section-categorie');
+        if(sec && sec.classList.contains('masqué')) return;
+
+        // sélection visuelle
+        reinitialiseCartes();
+        carte.setAttribute('aria-pressed','true');
+
+        const article = carte.querySelector('.detail');
+        if(article){
+          detail.className = 'detail';
+          detail.innerHTML = article.innerHTML;
+          animeFondu(detail);
+        }else{
+          afficheAttente();
+          appliquerFiltre();
+        }
+      });
+
+      // Initialisation : catégorie "vidéo" active sans animer le scroll
+      (function init(){
+        const actif = $('.bouton-rubrique[aria-current="page"]') || $('.bouton-rubrique[data-cat="video"]');
+        if(actif){
+          boutonsRubrique.forEach(b=>b.removeAttribute('aria-current'));
+          actif.setAttribute('aria-current','page');
+          const cat = actif.dataset.cat;
+          basculeCategorie(cat);
+          appliquerFiltre();
+          afficheAttente();
+          appliquerFiltre();
+        }
+      })();
+    })();
+  </script>
+</body>
+</html>
