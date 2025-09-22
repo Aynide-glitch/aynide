@@ -280,7 +280,7 @@
 <div class="entete-interne">
 <div class="marque">Catalogue <b>Régie</b> — Interface 3 panneaux</div>
 <div aria-hidden="true" class="indice">Choisis une rubrique puis une carte pour afficher la fiche →</div>
-<div class="header-actions"><button class="btn-switch" id="btn-open-switch" type="button">Espaces ▾</button><div aria-hidden="true" class="dd-espaces" id="dd-espaces" role="menu"><ul><li><button data-espace-target="regie-verte" type="button">Régie verte</button></li><li><button data-espace-target="regie-bleue" type="button">Régie bleue</button></li><li><button data-espace-target="production" type="button">Production</button></li><li><button data-espace-target="production-son" type="button">Production son</button></li><li><button data-espace-target="magasin-lumiere" type="button">Magasin lumière</button></li><li><button data-espace-target="magasin-audio" type="button">Magasin audio</button></li><li><button data-espace-target="magasin-video" type="button">Magasin vidéo</button></li></ul></div></div></div>
+<div class="header-actions"><button class="btn-switch" id="btn-home" type="button" aria-label="Retour à l'accueil (landing)"><img src="https://via.placeholder.com/32x32.png" alt="" width="28" height="28"/></button><div aria-hidden="true" class="dd-espaces" id="dd-espaces" role="menu"><ul><li><button data-espace-target="regie-verte" type="button">Régie verte</button></li><li><button data-espace-target="regie-bleue" type="button">Régie bleue</button></li><li><button data-espace-target="production" type="button">Production</button></li><li><button data-espace-target="production-son" type="button">Production son</button></li><li><button data-espace-target="magasin-lumiere" type="button">Magasin lumière</button></li><li><button data-espace-target="magasin-audio" type="button">Magasin audio</button></li><li><button data-espace-target="magasin-video" type="button">Magasin vidéo</button></li></ul></div></div></div>
 </header><div class="masqué" id="app"><main class="grille" role="main">
 <!-- =======================
          Panneau gauche : Rubriques
@@ -1424,9 +1424,7 @@
       function closeSwitch(){ $switch?.classList.remove('ouvert'); $switch?.setAttribute('aria-hidden', 'true'); }
 
       // Écouteurs overlay
-      $btnOpenSwitch?.addEventListener('click', openSwitch);
-      document.addEventListener('click', (e)=>{ if(e.target.closest('#btn-open-switch')) openSwitch(); });
-      $btnCloseSwitch?.addEventListener('click', closeSwitch);
+                  $btnCloseSwitch?.addEventListener('click', closeSwitch);
       $switch?.addEventListener('click', (e)=>{ if(e.target === $switch) closeSwitch(); });
 
       // Clics vers un espace (landing + overlay)
@@ -1436,6 +1434,7 @@
         const cible = btn.getAttribute('data-espace-target');
         if(!cible) return;
         setEspace(cible);
+        closeDropdown();
         closeSwitch();
       });
 
@@ -1606,5 +1605,20 @@
         document.querySelectorAll('.section-categorie').forEach(sec=>sec.classList.add('masqué'));
       }
 </script>
-<div aria-hidden="true" class="switch-espaces" id="switch-espaces"><div class="switch-panel anime-fondu"><div class="switch-header"><div class="switch-title">Changer d’espace</div><button class="switch-close" id="btn-close-switch" type="button">Fermer</button></div><div class="switch-grid"><button class="switch-item" data-espace-target="regie-verte" type="button"><span class="emoji">🎛️</span> Régie verte</button><button class="switch-item" data-espace-target="regie-bleue" type="button"><span class="emoji">🎚️</span> Régie bleue</button><button class="switch-item" data-espace-target="production" type="button"><span class="emoji">🎬</span> Production</button><button class="switch-item" data-espace-target="production-son" type="button"><span class="emoji">🎤</span> Production son</button><button class="switch-item" data-espace-target="magasin-lumiere" type="button"><span class="emoji">💡</span> Magasin lumière</button><button class="switch-item" data-espace-target="magasin-audio" type="button"><span class="emoji">🔊</span> Magasin audio</button><button class="switch-item" data-espace-target="magasin-video" type="button"><span class="emoji">📺</span> Magasin vidéo</button></div></div></div></body>
+<div aria-hidden="true" class="switch-espaces" id="switch-espaces"><div class="switch-panel anime-fondu"><div class="switch-header"><div class="switch-title">Changer d’espace</div><button class="switch-close" id="btn-close-switch" type="button">Fermer</button></div><div class="switch-grid"><button class="switch-item" data-espace-target="regie-verte" type="button"><span class="emoji">🎛️</span> Régie verte</button><button class="switch-item" data-espace-target="regie-bleue" type="button"><span class="emoji">🎚️</span> Régie bleue</button><button class="switch-item" data-espace-target="production" type="button"><span class="emoji">🎬</span> Production</button><button class="switch-item" data-espace-target="production-son" type="button"><span class="emoji">🎤</span> Production son</button><button class="switch-item" data-espace-target="magasin-lumiere" type="button"><span class="emoji">💡</span> Magasin lumière</button><button class="switch-item" data-espace-target="magasin-audio" type="button"><span class="emoji">🔊</span> Magasin audio</button><button class="switch-item" data-espace-target="magasin-video" type="button"><span class="emoji">📺</span> Magasin vidéo</button></div></div></div>
+<script>
+(function(){
+  function gotoLanding(){
+    try { location.hash = '#landing'; } catch(e){}
+    const landing = document.getElementById('landing');
+    const app = document.getElementById('app');
+    if(landing){ landing.classList.remove('masqué'); landing.scrollIntoView({behavior:'smooth'}); }
+    if(app){ app.classList.add('masqué'); }
+  }
+  const homes = document.querySelectorAll('#btn-home');
+  homes.forEach(btn => btn.addEventListener('click', gotoLanding));
+})();
+</script>
+
+</body>
 </html>
