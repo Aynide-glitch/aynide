@@ -185,27 +185,103 @@
 
   
     /* ===========================
-       Media (images & video embeds)
+       Landing page (choix d'espaces)
        =========================== */
-    .media{margin:10px 0}
-    .media img{
-      display:block; width:100%; height:auto;
-      border:1px solid var(--bordure); border-radius:12px;
-      background:#f8fafc; object-fit:contain;
+    #landing{min-height:100vh; display:grid; place-items:center; padding:40px 16px}
+    .landing-wrap{max-width:1100px; width:100%; text-align:center}
+    .landing-title{font-size:clamp(22px,3vw,32px); margin:0 0 10px; font-weight:800; letter-spacing:.2px}
+    .landing-sub{color:var(--atténué); margin:0 0 22px}
+    .landing-grid{
+      display:grid; gap:14px;
+      grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
     }
-    .media iframe{
-      display:block; width:100%; aspect-ratio:16/9; border:0; border-radius:12px;
+    .btn-espace{
+      appearance:none; border:1px solid var(--bordure); background:var(--bg2);
+      border-radius:16px; padding:18px 16px; cursor:pointer; font-weight:800;
+      box-shadow:var(--ombre); transition:transform .08s ease, border-color .2s ease;
     }
+    .btn-espace:hover{border-color:color-mix(in oklab, var(--bleu) 25%, var(--bordure))}
+    .btn-espace:active{transform:scale(.98)}
+    .btn-espace .tag{display:inline-block; margin-top:8px; font-weight:600; font-size:12px; color:var(--atténué)}
+    .emoji{font-size:22px; margin-right:8px}
+    .masqué{display:none !important}
+
+    /* ===========================
+       Overlay "Espaces"
+       =========================== */
+    .switch-espaces{
+      position:fixed; inset:0; background:color-mix(in oklab, #0b1220 60%, transparent);
+      display:none; align-items:center; justify-content:center; z-index:1000;
+    }
+    .switch-espaces.ouvert{display:flex}
+    .switch-panel{
+      width:min(860px, 92vw); background:var(--bg2); border:1px solid var(--bordure);
+      border-radius:18px; box-shadow:0 20px 80px rgba(0,0,0,.25); padding:20px;
+      animation: fondu .24s ease-out both;
+    }
+    .switch-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
+    .switch-title{font-weight:800; font-size:18px}
+    .switch-close{appearance:none; border:1px solid var(--bordure); background:#fff; padding:6px 10px; border-radius:10px; cursor:pointer}
+    .switch-grid{display:grid; gap:10px; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); margin-top:10px}
+    .switch-item{
+      appearance:none; border:1px solid var(--bordure); background:#fff; padding:14px; border-radius:14px; cursor:pointer;
+      text-align:left; font-weight:700;
+    }
+    .switch-item:hover{border-color:color-mix(in oklab, var(--bleu) 25%, var(--bordure))}
+    .badge-actif{display:inline-block; margin-left:8px; font-size:11px; padding:3px 8px; border-radius:999px; background:var(--bleu-50); border:1px solid color-mix(in oklab, var(--bleu) 25%, var(--bordure)); color:#0b2b7a}
+    .header-actions{display:flex; gap:8px; align-items:center}
+    .btn-switch{appearance:none; border:1px solid var(--bordure); background:var(--bg2); padding:6px 10px; border-radius:10px; cursor:pointer; font-weight:700}
+
+    /* ===========================
+       Dropdown "Espaces" (header)
+       =========================== */
+    .dd-espaces{position:absolute; top:100%; right:0; min-width:220px; background:var(--bg2);
+      border:1px solid var(--bordure); border-radius:14px; box-shadow:0 14px 60px rgba(0,0,0,.25);
+      opacity:0; transform:translateY(-6px); pointer-events:none; transition:opacity .16s ease, transform .16s ease; z-index:999}
+    .dd-espaces.ouvert{opacity:1; transform:translateY(4px); pointer-events:auto}
+    .dd-espaces ul{list-style:none; margin:6px; padding:6px}
+    .dd-espaces li{margin:0; padding:0}
+    .dd-espaces button{width:100%; text-align:left; appearance:none; background:#fff; border:1px solid transparent;
+      border-radius:10px; padding:10px 12px; cursor:pointer; font-weight:700}
+    .dd-espaces button:hover{border-color:color-mix(in oklab, var(--bleu) 25%, var(--bordure))}
+    .header-actions{position:relative} /* anchor for dropdown */
+    .badge-espace{display:inline-block; margin-left:8px; font-size:11px; padding:3px 8px; border-radius:999px;
+      background:var(--bleu-50); border:1px solid color-mix(in oklab, var(--bleu) 25%, var(--bordure)); color:#0b2b7a}
+
+    /* ===== Landing layout v2 ===== */
+    #landing{min-height:100vh; display:grid; place-items:center; padding:40px 16px}
+    .landing-wrap{max-width:1100px; width:100%; display:grid; gap:18px;
+      grid-template-rows: auto auto 1fr auto; align-items:center; justify-items:center}
+    .landing-video{width:min(920px, 95vw)}
+    .landing-video .media{margin:0}
+    .landing-title{font-size:clamp(22px,3vw,32px); margin:4px 0 10px; font-weight:800; letter-spacing:.2px; text-align:center}
+    .landing-grid{align-self:end; width:100%; display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(220px,1fr));}
+    .landing-apropos{width:100%; margin-top:18px}
 </style>
 </head>
-<body>
+<body><section id="landing"><div class="landing-wrap anime-fondu"><div class="landing-video"><p class="media video" data-yt="M7lc1UVf-VE"></p></div><h1 class="landing-title">Sélectionnez un espace</h1><div class="landing-grid"><button class="btn-espace" data-espace-target="regie-verte" type="button"><span class="emoji">🎛️</span><span>Régie verte</span></button><button class="btn-espace" data-espace-target="regie-bleue" type="button"><span class="emoji">🎚️</span><span>Régie bleue</span></button><button class="btn-espace" data-espace-target="production" type="button"><span class="emoji">🎬</span><span>Production</span></button><button class="btn-espace" data-espace-target="production-son" type="button"><span class="emoji">🎤</span><span>Production son</span></button><button class="btn-espace" data-espace-target="magasin-lumiere" type="button"><span class="emoji">💡</span><span>Magasin lumière</span></button><button class="btn-espace" data-espace-target="magasin-audio" type="button"><span class="emoji">🔊</span><span>Magasin audio</span></button><button class="btn-espace" data-espace-target="magasin-video" type="button"><span class="emoji">📺</span><span>Magasin vidéo</span></button></div><div class="landing-apropos"><details class="apropos">
+<summary>À propos de ce site (cliquez ici pour lire une belle histoire)</summary>
+<div class="contenu-apropos">
+<p>Ce site a pris environ neuf heures à être construit mais il reste imparfait malgré nos efforts : merci d’être tolérant·e avec nous.</p>
+<p>Un jour, Karim a croisé un verre de lait‑fraise très aimable et une bande de fraises Tagada un brin turbulentes.</p>
+<p>Nous avons alors monté l’opération <em>Mission Monnaert</em> : livrer ces douceurs à M. Monnaert, notre professeur, sans rien égarer en route.</p>
+<p>Le trajet fut digne d’un film d’action (moins les explosions) ; oui, nous avons goûté une ou deux friandises… pour le contrôle qualité.</p>
+<p>Au final, la livraison a bien été effectuée, et le sourire de M. Monnaert valait bien toutes ces péripéties.</p>
+<div class="licence-cc">
+<p><strong>Licence :</strong> Ce travail est sous licence
+            <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr" rel="license noopener" target="_blank">Creative Commons BY‑NC‑ND 4.0</a>
+            (attribution, non‑commercial, pas de modifications). Pour toute autre utilisation, merci de contacter M.HAMIDOU à l'adresse karim.hamidou200725@gmail.com</p>
+</div>
+<p class="credit">Site web développé avec 🤍 par Karim HAMIDOU et Théandre GOUBET — alimentés au lait‑fraise et aux fraises Tagada.</p>
+<p class="credit">Données cherchées par LEMAIRE Nolan, BERTRAND Steven, ALLAIN Gabriel, GOUBET Théandre et HAMIDOU Karim.</p>
+</div>
+</details></div></div></section>
 <header aria-label="En-tête" role="banner">
 <div class="entete-interne">
 <div class="marque">Catalogue <b>Régie</b> — Interface 3 panneaux</div>
 <div aria-hidden="true" class="indice">Choisis une rubrique puis une carte pour afficher la fiche →</div>
-</div>
-</header>
-<main class="grille" role="main">
+<div class="header-actions"><button class="btn-switch" id="btn-open-switch" type="button">Espaces ▾</button><div aria-hidden="true" class="dd-espaces" id="dd-espaces" role="menu"><ul><li><button data-espace-target="regie-verte" type="button">Régie verte</button></li><li><button data-espace-target="regie-bleue" type="button">Régie bleue</button></li><li><button data-espace-target="production" type="button">Production</button></li><li><button data-espace-target="production-son" type="button">Production son</button></li><li><button data-espace-target="magasin-lumiere" type="button">Magasin lumière</button></li><li><button data-espace-target="magasin-audio" type="button">Magasin audio</button></li><li><button data-espace-target="magasin-video" type="button">Magasin vidéo</button></li></ul></div></div></div>
+</header><div class="masqué" id="app"><main class="grille" role="main">
 <!-- =======================
          Panneau gauche : Rubriques
          ======================= -->
@@ -232,7 +308,7 @@
          ======================= -->
 <section aria-label="Liste d’équipements" class="panneau centre">
 <!-- AUDIO -->
-<div aria-label="Audio — Liste" class="section-categorie masqué" data-cat="audio" role="region">
+<div aria-label="Audio — Liste" class="section-categorie masqué" data-cat="audio" data-espace="regie-verte" role="region">
 <div class="cartes">
 <!-- ANTMIX 12 FX -->
 <button aria-pressed="false" class="carte" data-id="antmix-12-fx" type="button">
@@ -247,7 +323,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>ANTMIX 12 FX</h2>
-<p class="sous">Marque/Modèle · ANT · MIX 12 FX</p><p class="media"><img alt="ANTMIX 12 FX — photo" loading="lazy" src="assets/img/antmix-12-fx.jpg"/></p>
+<p class="sous">Marque/Modèle · ANT · MIX 12 FX</p>
 <div>
 <span class="pastille">table de mixage</span><span class="pastille">audio</span>
 </div>
@@ -277,7 +353,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>2 Mix</h2>
-<p class="sous">Marque · Blackmagic Design</p><p class="media"><img alt="2 Mix — photo" loading="lazy" src="assets/img/2-mix.jpg"/></p>
+<p class="sous">Marque · Blackmagic Design</p>
 <div><span class="pastille">audio</span></div>
 <table class="caracts">
 <tbody>
@@ -301,7 +377,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Codec Phone</h2>
-<p class="sous">Marque · ABC</p><p class="media"><img alt="Codec Phone — photo" loading="lazy" src="assets/img/codec-phone.jpg"/></p>
+<p class="sous">Marque · ABC</p>
 <div><span class="pastille">codec</span><span class="pastille">téléphone</span></div>
 <p class="description"><strong>À quoi ça sert ?</strong> Permet d’intégrer une intervention téléphonique à l’antenne/au plateau avec une qualité stabilisée (ligne hybride/VoIP). Indispensable pour interviews à distance. Modèle précis à confirmer.</p>
 </div>
@@ -320,7 +396,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Demux (SDI → Audio)</h2>
-<p class="sous">Marque · Blackmagic Design</p><p class="media"><img alt="Demux (SDI → Audio) — photo" loading="lazy" src="assets/img/demux-sdi-audio.jpg"/></p>
+<p class="sous">Marque · Blackmagic Design</p>
 <div><span class="pastille">désemboitage</span><span class="pastille">sdi</span><span class="pastille">audio</span></div>
 <table class="caracts">
 <tbody>
@@ -344,7 +420,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>the t.bone HPA6</h2>
-<p class="sous">Marque/Modèle · the t.bone · HPA6</p><p class="media"><img alt="the t.bone HPA6 — photo" loading="lazy" src="assets/img/the-tbone-hpa6.jpg"/></p>
+<p class="sous">Marque/Modèle · the t.bone · HPA6</p>
 <div><span class="pastille">ampli casque</span></div>
 <table class="caracts">
 <tbody>
@@ -370,7 +446,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Intercom centrale</h2>
-<p class="sous">Marque · ATS (Options)</p><p class="media"><img alt="Intercom centrale — photo" loading="lazy" src="assets/img/intercom-centrale.jpg"/></p>
+<p class="sous">Marque · ATS (Options)</p>
 <div><span class="pastille">intercom</span></div>
 <p class="description"><strong>À quoi ça sert ?</strong> Cœur du système de communication technique (régie ↔ plateau, caméras, machinerie). Gère les groupes, le talkback et parfois le tally. Nombre exact de canaux/ports à confirmer.</p>
 <p class="notes"><strong>Notes :</strong> « 9 only » mentionné à vérifier.</p>
@@ -389,7 +465,7 @@
 </div>
 <article class="detail masqué">
 <div class="detail">
-<h2>POST Entrances ?</h2><p class="media"><img alt="POST Entrances ? — photo" loading="lazy" src="assets/img/post-entrances.jpg"/></p>
+<h2>POST Entrances ?</h2>
 <div><span class="pastille">routing</span><span class="pastille">sdi</span><span class="pastille">audio</span></div>
 <table class="caracts">
 <tbody>
@@ -414,7 +490,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Produit 4026 AV</h2>
-<p class="sous">Marque · PLAYTRONIC</p><p class="media"><img alt="Produit 4026 AV — photo" loading="lazy" src="assets/img/produit-4026-av.jpg"/></p>
+<p class="sous">Marque · PLAYTRONIC</p>
 <div><span class="pastille">à confirmer</span></div>
 <table class="caracts">
 <tbody>
@@ -428,7 +504,7 @@
 </div>
 </div>
 <!-- VIDEO (active par défaut) -->
-<div aria-label="Vidéo — Liste" class="section-categorie" data-cat="video" role="region">
+<div aria-label="Vidéo — Liste" class="section-categorie" data-cat="video" data-espace="regie-verte" role="region">
 <div class="cartes">
 <!-- Sony XVS-6000 -->
 <button aria-pressed="false" class="carte" data-id="sony-xvs-6000" type="button">
@@ -443,7 +519,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Sony XVS-6000</h2>
-<p class="sous">Mélangeur de production vidéo</p><p class="media"><img alt="Sony XVS-6000 — photo" loading="lazy" src="assets/img/sony-xvs-6000.jpg"/></p><p class="media video" data-yt="OfT3vZHxIVk"></p>
+<p class="sous">Mélangeur de production vidéo</p>
 <div><span class="pastille">mélangeur</span><span class="pastille">réalisation</span><span class="pastille">key</span><span class="pastille">multicam</span></div>
 <table class="caracts">
 <tbody>
@@ -471,7 +547,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Sony MKS-X7017 (Pupitre)</h2>
-<p class="sous">Panel opérateur pour XVS-6000</p><p class="media"><img alt="Sony MKS-X7017 (Pupitre) — photo" loading="lazy" src="assets/img/sony-mks-x7017.jpg"/></p><p class="media video" data-yt="OfT3vZHxIVk"></p>
+<p class="sous">Panel opérateur pour XVS-6000</p>
 <div><span class="pastille">panneau de contrôle</span><span class="pastille">t-bar</span><span class="pastille">surface</span></div>
 <table class="caracts">
 <tbody>
@@ -499,7 +575,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Sony MKS-X7018 (Pupitre)</h2>
-<p class="sous">Panel opérateur pour XVS-6000</p><p class="media"><img alt="Sony MKS-X7018 (Pupitre) — photo" loading="lazy" src="assets/img/sony-mks-x7018.jpg"/></p><p class="media video" data-yt="OfT3vZHxIVk"></p>
+<p class="sous">Panel opérateur pour XVS-6000</p>
 <div><span class="pastille">panneau de contrôle</span><span class="pastille">t-bar</span><span class="pastille">surface</span></div>
 <table class="caracts"><tbody>
 <tr><th>Connexions</th><td>Ethernet vers XVS-6000</td></tr>
@@ -524,7 +600,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Sony MKS-X7031 (Pupitre)</h2>
-<p class="sous">Panel opérateur pour XVS-6000</p><p class="media"><img alt="Sony MKS-X7031 (Pupitre) — photo" loading="lazy" src="assets/img/sony-mks-x7031.jpg"/></p><p class="media video" data-yt="OfT3vZHxIVk"></p>
+<p class="sous">Panel opérateur pour XVS-6000</p>
 <div><span class="pastille">panneau de contrôle</span><span class="pastille">t-bar</span><span class="pastille">surface</span></div>
 <table class="caracts"><tbody>
 <tr><th>Connexions</th><td>Ethernet vers XVS-6000</td></tr>
@@ -549,7 +625,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Sony MKS-X2920</h2>
-<p class="sous">Interface système</p><p class="media"><img alt="Sony MKS-X2920 — photo" loading="lazy" src="assets/img/sony-mks-x2920.jpg"/></p>
+<p class="sous">Interface système</p>
 <div><span class="pastille">interface</span><span class="pastille">panneaux</span><span class="pastille">tally</span><span class="pastille">gpi</span></div>
 <table class="caracts"><tbody>
 <tr><th>Ports</th><td>Ethernet, série, GPI/O</td></tr>
@@ -574,7 +650,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Blackmagic Audio Monitor 12G</h2>
-<p class="sous">Unité de monitoring audio 12G</p><p class="media"><img alt="Blackmagic Audio Monitor 12G — photo" loading="lazy" src="assets/img/bmd-audio-monitor-12g.jpg"/></p>
+<p class="sous">Unité de monitoring audio 12G</p>
 <div><span class="pastille">monitoring audio</span><span class="pastille">12G-SDI</span><span class="pastille">désemboitage</span></div>
 <table class="caracts"><tbody>
 <tr><th>Entrées</th><td>12G-SDI, AES/EBU, XLR/RCA</td></tr>
@@ -599,7 +675,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Blackmagic SmartView 4K</h2>
-<p class="sous">Moniteur 4K pour sources SDI</p><p class="media"><img alt="Blackmagic SmartView 4K — photo" loading="lazy" src="assets/img/bmd-smartview-4k.jpg"/></p>
+<p class="sous">Moniteur 4K pour sources SDI</p>
 <div><span class="pastille">écran</span><span class="pastille">monitoring</span><span class="pastille">12G-SDI</span></div>
 <table class="caracts"><tbody>
 <tr><th>Entrées</th><td>2× 12G-SDI (boucle)</td></tr>
@@ -624,7 +700,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Teranex Mini — Audio → SDI</h2>
-<p class="sous">Blackmagic Design</p><p class="media"><img alt="Teranex Mini — Audio → SDI — photo" loading="lazy" src="assets/img/bmd-teranex-audio-to-sdi.jpg"/></p>
+<p class="sous">Blackmagic Design</p>
 <div><span class="pastille">convertisseur</span><span class="pastille">embed</span><span class="pastille">audio</span></div>
 <table class="caracts"><tbody>
 <tr><th>Entrées</th><td>Audio analogique/AES</td></tr>
@@ -649,7 +725,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Teranex Mini — SDI → HDMI</h2>
-<p class="sous">Blackmagic Design</p><p class="media"><img alt="Teranex Mini — SDI → HDMI — photo" loading="lazy" src="assets/img/bmd-teranex-sdi-to-hdmi.jpg"/></p>
+<p class="sous">Blackmagic Design</p>
 <div><span class="pastille">convertisseur</span><span class="pastille">monitoring</span><span class="pastille">hdmi</span></div>
 <table class="caracts"><tbody>
 <tr><th>Entrées</th><td>12G-SDI</td></tr>
@@ -674,7 +750,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Teranex Mini — SDI → Audio</h2>
-<p class="sous">Blackmagic Design</p><p class="media"><img alt="Teranex Mini — SDI → Audio — photo" loading="lazy" src="assets/img/bmd-teranex-sdi-to-audio.jpg"/></p>
+<p class="sous">Blackmagic Design</p>
 <div><span class="pastille">convertisseur</span><span class="pastille">de-embed</span><span class="pastille">audio</span></div>
 <table class="caracts"><tbody>
 <tr><th>Entrées</th><td>12G-SDI</td></tr>
@@ -699,7 +775,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Teranex Mini — SDI → Analogique</h2>
-<p class="sous">Blackmagic Design</p><p class="media"><img alt="Teranex Mini — SDI → Analogique — photo" loading="lazy" src="assets/img/bmd-teranex-sdi-to-analog.jpg"/></p>
+<p class="sous">Blackmagic Design</p>
 <div><span class="pastille">convertisseur</span><span class="pastille">analogique</span></div>
 <table class="caracts"><tbody>
 <tr><th>Entrées</th><td>12G-SDI</td></tr>
@@ -724,7 +800,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>HyperDeck Studio Mini</h2>
-<p class="sous">Blackmagic Design</p><p class="media"><img alt="HyperDeck Studio Mini — photo" loading="lazy" src="assets/img/bmd-hyperdeck-studio-mini.jpg"/></p>
+<p class="sous">Blackmagic Design</p>
 <div><span class="pastille">enregistreur</span><span class="pastille">playout</span><span class="pastille">secours</span></div>
 <table class="caracts"><tbody>
 <tr><th>Vidéo</th><td>SDI 6G I/O, HDMI</td></tr>
@@ -750,7 +826,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>AJA Io IP</h2>
-<p class="sous">Interface régie ↔ IP</p><p class="media"><img alt="AJA Io IP — photo" loading="lazy" src="assets/img/aja-io-ip.jpg"/></p>
+<p class="sous">Interface régie ↔ IP</p>
 <div><span class="pastille">ip</span><span class="pastille">st2110</span><span class="pastille">passerelle</span></div>
 <table class="caracts"><tbody>
 <tr><th>Standards</th><td>SMPTE 2022/2110</td></tr>
@@ -775,7 +851,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>AJA Hi5-4K-Plus</h2>
-<p class="sous">Convertisseur SDI vers HDMI</p><p class="media"><img alt="AJA Hi5-4K-Plus — photo" loading="lazy" src="assets/img/aja-hi5-4k-plus.jpg"/></p>
+<p class="sous">Convertisseur SDI vers HDMI</p>
 <div><span class="pastille">convertisseur</span><span class="pastille">4K</span><span class="pastille">HDMI</span></div>
 <table class="caracts"><tbody>
 <tr><th>Entrées</th><td>4× 3G-SDI (quad) ou 12G-SDI</td></tr>
@@ -798,7 +874,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Tektronix WFM-1600R</h2>
-<p class="sous">Analyse SDI</p><p class="media"><img alt="Tektronix WFM-1600R — photo" loading="lazy" src="assets/img/tektronix-wfm-1600r.jpg"/></p>
+<p class="sous">Analyse SDI</p>
 <div><span class="pastille">waveform</span><span class="pastille">vectorscope</span><span class="pastille">analyse</span></div>
 <table class="caracts"><tbody>
 <tr><th>Entrées</th><td>SD/HD/3G-SDI</td></tr>
@@ -821,7 +897,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Telestream SPG700</h2>
-<p class="sous">Référence vidéo/clock</p><p class="media"><img alt="Telestream SPG700 — photo" loading="lazy" src="assets/img/telestream-spg700.jpg"/></p>
+<p class="sous">Référence vidéo/clock</p>
 <div><span class="pastille">générateur de synchro</span><span class="pastille">référence</span><span class="pastille">clock</span></div>
 <table class="caracts"><tbody>
 <tr><th>Sorties</th><td>Black burst, Tri-level, 3G/HD/SD</td></tr>
@@ -846,7 +922,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Sony HD CCU</h2>
-<p class="sous">Unité de contrôle</p><p class="media"><img alt="Sony HD CCU — photo" loading="lazy" src="assets/img/sony-hd-ccu.jpg"/></p>
+<p class="sous">Unité de contrôle</p>
 <div><span class="pastille">ccu</span><span class="pastille">caméra</span><span class="pastille">plateau</span></div>
 <table class="caracts"><tbody>
 <tr><th>Entrée</th><td>Fibre caméra</td></tr>
@@ -861,7 +937,7 @@
 </div>
 </div>
 <!-- RESEAU -->
-<div aria-label="Réseau — Liste" class="section-categorie masqué" data-cat="reseau" role="region">
+<div aria-label="Réseau — Liste" class="section-categorie masqué" data-cat="reseau" data-espace="regie-verte" role="region">
 <div class="cartes">
 <button aria-pressed="false" class="carte" data-id="netgear-prosafe-jgs516pe" type="button">
 <div class="ligne-carte">
@@ -875,7 +951,7 @@
 <article class="detail masqué">
 <div class="detail">
 <h2>Netgear ProSAFE JGS516PE</h2>
-<p class="sous">Switch 16 ports</p><p class="media"><img alt="Netgear ProSAFE JGS516PE — photo" loading="lazy" src="assets/img/netgear-prosafe-jgs516pe.jpg"/></p>
+<p class="sous">Switch 16 ports</p>
 <div><span class="pastille">switch</span><span class="pastille">poe</span><span class="pastille">réseau régie</span></div>
 <table class="caracts"><tbody>
 <tr><th>Ports</th><td>16× 1G (dont 8 PoE)</td></tr>
@@ -891,7 +967,7 @@
 </div>
 </div>
 <!-- MONITORING -->
-<div aria-label="Monitoring — Liste" class="section-categorie masqué" data-cat="monitoring" role="region">
+<div aria-label="Monitoring — Liste" class="section-categorie masqué" data-cat="monitoring" data-espace="regie-verte" role="region">
 <div class="cartes">
 <button aria-pressed="false" class="carte" data-id="lawo-vsm" type="button">
 <div class="ligne-carte">
@@ -904,7 +980,7 @@
 </div>
 <article class="detail masqué"><div class="detail">
 <h2>Lawo VSM</h2>
-<p class="sous">Contrôle IP des équipements connectés</p><p class="media"><img alt="Lawo VSM — photo" loading="lazy" src="assets/img/lawo-vsm.jpg"/></p>
+<p class="sous">Contrôle IP des équipements connectés</p>
 <div><span class="pastille">supervision</span><span class="pastille">contrôle centralisé</span><span class="pastille">routing</span></div>
 <table class="caracts"><tbody>
 <tr><th>Contrôle</th><td>IP sur équipements connectés</td></tr>
@@ -927,7 +1003,7 @@
 </div>
 <article class="detail masqué"><div class="detail">
 <h2>HP EliteDesk</h2>
-<p class="sous">PC de contrôle</p><p class="media"><img alt="HP EliteDesk — photo" loading="lazy" src="assets/img/hp-elitedesk.jpg"/></p>
+<p class="sous">PC de contrôle</p>
 <div><span class="pastille">station</span><span class="pastille">automation</span><span class="pastille">gestion</span></div>
 <table class="caracts"><tbody><tr><th>I/O</th><td>USB, Ethernet, HDMI/DP</td></tr></tbody></table>
 <p class="description"><strong>À quoi ça sert ?</strong> Machine dédiée aux logiciels de contrôle/automation, supervision ou diffusion d’assets. <a href="https://www.google.com/url?sa=t&amp;rct=j&amp;q=&amp;esrc=s&amp;source=web&amp;cd=&amp;cad=rja&amp;uact=8&amp;ved=2ahUKEwjB3eD4rOqPAxWwUqQEHfY8FHoQFnoECBcQAQ&amp;url=https%3A%2F%2Fh10032.www1.hp.com%2Fctg%2FManual%2Fc03803202.pdf&amp;usg=AOvVaw2fUvI7AuAP7rIywEJwomnK&amp;opi=89978449" rel="noopener noreferrer" target="_blank">
@@ -946,7 +1022,7 @@
 </div>
 <article class="detail masqué"><div class="detail">
 <h2>HP Z400</h2>
-<p class="sous">Station de travail</p><p class="media"><img alt="HP Z400 — photo" loading="lazy" src="assets/img/hp-z400.jpg"/></p>
+<p class="sous">Station de travail</p>
 <div><span class="pastille">workstation</span><span class="pastille">traitement média</span></div>
 <table class="caracts"><tbody><tr><th>I/O</th><td>USB, Ethernet, HDMI/DP</td></tr></tbody></table>
 <p class="description"><strong>À quoi ça sert ?</strong> Postes puissants pour encodage, transcodage, contrôle graphique ou serveurs locaux. <a href="https://www.google.com/url?sa=t&amp;rct=j&amp;q=&amp;esrc=s&amp;source=web&amp;cd=&amp;cad=rja&amp;uact=8&amp;ved=2ahUKEwjx2KjmreqPAxVVAvsDHWFLFUcQFnoECBkQAQ&amp;url=https%3A%2F%2Fh10032.www1.hp.com%2Fctg%2FManual%2Fc01706256.pdf&amp;usg=AOvVaw1LHltfE03UO5Ft_RNRZcFs&amp;opi=89978449" rel="noopener noreferrer" target="_blank">
@@ -965,7 +1041,7 @@
 </div>
 <article class="detail masqué"><div class="detail">
 <h2>Sony PWS-1100</h2>
-<p class="sous">Serveur de production</p><p class="media"><img alt="Sony PWS-1100 — photo" loading="lazy" src="assets/img/sony-pws-1100.jpg"/></p>
+<p class="sous">Serveur de production</p>
 <div><span class="pastille">serveur</span><span class="pastille">ip</span><span class="pastille">production</span></div>
 <table class="caracts"><tbody><tr><th>I/O</th><td>IP/SDI selon configuration</td></tr></tbody></table>
 <p class="description"><strong>À quoi ça sert ?</strong> Nodal de traitement/ingest/échange entre environnements SDI et IP selon les cartes installées. <a href="https://www.google.com/url?sa=t&amp;rct=j&amp;q=&amp;esrc=s&amp;source=web&amp;cd=&amp;cad=rja&amp;uact=8&amp;ved=2ahUKEwjoxq2EruqPAxWqVaQEHbUXNwoQFnoECBYQAQ&amp;url=https%3A%2F%2Fwww.sony.com%2Felectronics%2Fsupport%2Fres%2Fmanuals%2F4596%2Fd3242d0c090021c828f0876f56f3da5f%2F45969900M.pdf&amp;usg=AOvVaw00E4XkCOtZNoKweOjhJUyQ&amp;opi=89978449" rel="noopener noreferrer" target="_blank">
@@ -976,7 +1052,7 @@
 </div>
 </div>
 <!-- CABLERIE -->
-<div aria-label="Câblerie — Liste" class="section-categorie masqué" data-cat="cablerie" role="region">
+<div aria-label="Câblerie — Liste" class="section-categorie masqué" data-cat="cablerie" data-espace="regie-verte" role="region">
 <div class="cartes">
 <button aria-pressed="false" class="carte" data-id="fibre-optique-ccu" type="button">
 <div class="ligne-carte">
@@ -988,7 +1064,7 @@
 </div>
 </div>
 <article class="detail masqué"><div class="detail">
-<h2>Fibre optique (CCU ↔ caméras)</h2><p class="media"><img alt="Fibre optique (CCU ↔ caméras) — photo" loading="lazy" src="assets/img/fibre-optique-ccu.jpg"/></p>
+<h2>Fibre optique (CCU ↔ caméras)</h2>
 <div><span class="pastille">fibre</span><span class="pastille">caméra</span><span class="pastille">ccu</span></div>
 <table class="caracts"><tbody>
 <tr><th>Usage</th><td>Liaison caméra studio longue distance</td></tr>
@@ -1007,7 +1083,7 @@
 </div>
 </div>
 <article class="detail masqué"><div class="detail">
-<h2>SDI / 12G-SDI</h2><p class="media"><img alt="SDI / 12G-SDI — photo" loading="lazy" src="assets/img/sdi-12g.jpg"/></p>
+<h2>SDI / 12G-SDI</h2>
 <div><span class="pastille">sdi</span><span class="pastille">12g</span><span class="pastille">vidéo</span></div>
 <table class="caracts"><tbody>
 <tr><th>Usage</th><td>Liaisons vidéo professionnelles</td></tr>
@@ -1028,7 +1104,7 @@
 </div>
 </div>
 <article class="detail masqué"><div class="detail">
-<h2>XLR / AES</h2><p class="media"><img alt="XLR / AES — photo" loading="lazy" src="assets/img/xlr-aes.jpg"/></p>
+<h2>XLR / AES</h2>
 <div><span class="pastille">audio</span><span class="pastille">xlr</span><span class="pastille">aes</span></div>
 <table class="caracts"><tbody>
 <tr><th>Usage</th><td>Transport analogique pro &amp; AES/EBU</td></tr>
@@ -1047,7 +1123,7 @@
 </div>
 </div>
 <article class="detail masqué"><div class="detail">
-<h2>HDMI</h2><p class="media"><img alt="HDMI — photo" loading="lazy" src="assets/img/hdmi.jpg"/></p>
+<h2>HDMI</h2>
 <div><span class="pastille">hdmi</span><span class="pastille">monitoring</span></div>
 <table class="caracts"><tbody>
 <tr><th>Usage</th><td>Écrans locaux/consommateur</td></tr>
@@ -1066,7 +1142,7 @@
 </div>
 </div>
 <article class="detail masqué"><div class="detail">
-<h2>Patch panels (baie technique)</h2><p class="media"><img alt="Patch panels (baie technique) — photo" loading="lazy" src="assets/img/patch-panels.jpg"/></p>
+<h2>Patch panels (baie technique)</h2>
 <div><span class="pastille">patch</span><span class="pastille">baie</span><span class="pastille">routing</span></div>
 <table class="caracts"><tbody>
 <tr><th>Usage</th><td>Redirection des signaux (SDI/XLR/éthernet)</td></tr>
@@ -1078,7 +1154,7 @@
 </div>
 </div>
 <!-- ACCESSOIRES -->
-<div aria-label="Accessoires — Liste" class="section-categorie masqué" data-cat="accessoires" role="region">
+<div aria-label="Accessoires — Liste" class="section-categorie masqué" data-cat="accessoires" data-espace="regie-verte" role="region">
 <div class="cartes">
 <button aria-pressed="false" class="carte" data-id="hp-usb-slim-keyboard" type="button">
 <div class="ligne-carte">
@@ -1090,7 +1166,7 @@
 </div>
 </div>
 <article class="detail masqué"><div class="detail">
-<h2>HP USB Slim Keyboard</h2><p class="media"><img alt="HP USB Slim Keyboard — photo" loading="lazy" src="assets/img/hp-usb-slim-keyboard.jpg"/></p>
+<h2>HP USB Slim Keyboard</h2>
 <div><span class="pastille">clavier</span><span class="pastille">usb</span></div>
 <table class="caracts"><tbody><tr><th>Type</th><td>Clavier opérateur</td></tr></tbody></table>
 <p class="description"><strong>À quoi ça sert ?</strong> Entrées clavier fiables pour serveurs, automation et machines de pilotage. <a href="https://www.google.com/url?sa=t&amp;rct=j&amp;q=&amp;esrc=s&amp;source=web&amp;cd=&amp;cad=rja&amp;uact=8&amp;ved=2ahUKEwiDyoTLruqPAxU0TaQEHTEFE-QQFnoECBcQAQ&amp;url=https%3A%2F%2Fh20195.www2.hp.com%2Fv2%2Fgetpdf.aspx%2Fc05389400.pdf&amp;usg=AOvVaw32yTrmHWkXG9HZHX4oMq7c&amp;opi=89978449" rel="noopener noreferrer" target="_blank">
@@ -1108,7 +1184,7 @@
 </div>
 </div>
 <article class="detail masqué"><div class="detail">
-<h2>Kit micro HF Digicom Pro</h2><p class="media"><img alt="Kit micro HF Digicom Pro — photo" loading="lazy" src="assets/img/kit-micro-hf-digicom-pro.jpg"/></p>
+<h2>Kit micro HF Digicom Pro</h2>
 <div><span class="pastille">micro</span><span class="pastille">hf</span></div>
 <table class="caracts"><tbody><tr><th>Type</th><td>Liaison sans fil UHF/2,4 GHz (selon modèle)</td></tr></tbody></table>
 <p class="description"><strong>À quoi ça sert ?</strong> Sonorise présentateurs/invités sans câble, via récepteurs en régie.</p>
@@ -1124,7 +1200,7 @@
 </div>
 </div>
 <article class="detail masqué"><div class="detail">
-<h2>Logitech HD (USB)</h2><p class="media"><img alt="Logitech HD (USB) — photo" loading="lazy" src="assets/img/logitech-hd-usb.jpg"/></p>
+<h2>Logitech HD (USB)</h2>
 <div><span class="pastille">webcam</span><span class="pastille">usb</span></div>
 <table class="caracts"><tbody><tr><th>Type</th><td>Caméra USB pour retours visio/monitoring</td></tr></tbody></table>
 <p class="description"><strong>À quoi ça sert ?</strong> Utilitaire pour retours, streaming secondaire ou contrôle distant. <a href="https://www.google.com/url?sa=t&amp;rct=j&amp;q=&amp;esrc=s&amp;source=web&amp;cd=&amp;cad=rja&amp;uact=8&amp;ved=2ahUKEwj3q8-jr-qPAxWLUqQEHahWJoAQFnoECBcQAQ&amp;url=https%3A%2F%2Fdocs.rs-online.com%2Ffb8a%2F0900766b8154c932.pdf&amp;usg=AOvVaw3OIIGOICPkXIqyZ_P58q1p&amp;opi=89978449" rel="noopener noreferrer" target="_blank">
@@ -1142,7 +1218,7 @@
 </div>
 </div>
 <article class="detail masqué"><div class="detail">
-<h2>Télécommande lumière (MA Lighting)</h2><p class="media"><img alt="Télécommande lumière (MA Lighting) — photo" loading="lazy" src="assets/img/telecommande-lumiere-ma.jpg"/></p>
+<h2>Télécommande lumière (MA Lighting)</h2>
 <div><span class="pastille">lumière</span><span class="pastille">dmx</span></div>
 <table class="caracts"><tbody>
 <tr><th>Protocoles</th><td>DMX/ArtNet</td></tr>
@@ -1160,7 +1236,7 @@
 </div>
 </div>
 <article class="detail masqué"><div class="detail">
-<h2>Écrans de retour plateau (Sony)</h2><p class="media"><img alt="Écrans de retour plateau (Sony) — photo" loading="lazy" src="assets/img/ecrans-retour-sony.jpg"/></p>
+<h2>Écrans de retour plateau (Sony)</h2>
 <div><span class="pastille">retour</span><span class="pastille">écran</span></div>
 <table class="caracts"><tbody>
 <tr><th>Entrées</th><td>HDMI / SDI via convertisseur</td></tr>
@@ -1171,7 +1247,7 @@
 </div>
 </div>
 <!-- PLATEAU -->
-<div aria-label="Plateau — Liste" class="section-categorie masqué" data-cat="plateau" role="region">
+<div aria-label="Plateau — Liste" class="section-categorie masqué" data-cat="plateau" data-espace="regie-verte" role="region">
 <div class="cartes">
 <button aria-pressed="false" class="carte" data-id="cameras-sony-x4" type="button">
 <div class="ligne-carte">
@@ -1183,7 +1259,7 @@
 </div>
 </div>
 <article class="detail masqué"><div class="detail">
-<h2>Caméras Sony (x4)</h2><p class="media"><img alt="Caméras Sony (x4) — photo" loading="lazy" src="assets/img/cameras-sony-x4.jpg"/></p>
+<h2>Caméras Sony (x4)</h2>
 <div><span class="pastille">caméras</span><span class="pastille">plateau</span></div>
 <table class="caracts"><tbody><tr><th>Liaison</th><td>Fibre → CCU</td></tr></tbody></table>
 <p class="description"><strong>À quoi ça sert ?</strong> Prise de vues studio reliée en fibre à la régie : alimentation, intercom, tally et vidéo transitent ensemble.</p>
@@ -1199,7 +1275,7 @@
 </div>
 </div>
 <article class="detail masqué"><div class="detail">
-<h2>Projecteurs ARRI (x26)</h2><p class="media"><img alt="Projecteurs ARRI (x26) — photo" loading="lazy" src="assets/img/projecteurs-arri-x26.jpg"/></p>
+<h2>Projecteurs ARRI (x26)</h2>
 <div><span class="pastille">éclairage</span><span class="pastille">arri</span></div>
 <table class="caracts"><tbody>
 <tr><th>Alimentation</th><td>Secteur</td></tr>
@@ -1218,7 +1294,7 @@
 </div>
 </div>
 <article class="detail masqué"><div class="detail">
-<h2>Téléviseurs Sony (x2)</h2><p class="media"><img alt="Téléviseurs Sony (x2) — photo" loading="lazy" src="assets/img/televiseurs-sony-x2.jpg"/></p>
+<h2>Téléviseurs Sony (x2)</h2>
 <div><span class="pastille">retour</span><span class="pastille">écran</span></div>
 <table class="caracts"><tbody><tr><th>Entrées</th><td>HDMI / SDI via convertisseur</td></tr></tbody></table>
 <p class="description"><strong>À quoi ça sert ?</strong> Moniteurs retour pour le public, le plateau ou le contrôle décor.</p>
@@ -1234,7 +1310,7 @@
 </div>
 </div>
 <article class="detail masqué"><div class="detail">
-<h2>Enceintes MA120 MKII + ampli</h2><p class="media"><img alt="Enceintes MA120 MKII + ampli — photo" loading="lazy" src="assets/img/enceintes-ma120-mkii-ampli.jpg"/></p>
+<h2>Enceintes MA120 MKII + ampli</h2>
 <div><span class="pastille">audio</span><span class="pastille">retour</span></div>
 <table class="caracts"><tbody>
 <tr><th>Entrées</th><td>XLR/Jack</td></tr>
@@ -1255,7 +1331,7 @@
 </div>
 </div>
 <article class="detail masqué"><div class="detail">
-<h2>Micros (x2 HF + x2 filaires)</h2><p class="media"><img alt="Micros (x2 HF + x2 filaires) — photo" loading="lazy" src="assets/img/micros-hf-filaires.jpg"/></p>
+<h2>Micros (x2 HF + x2 filaires)</h2>
 <div><span class="pastille">micro</span><span class="pastille">plateau</span></div>
 <table class="caracts"><tbody><tr><th>Connexions</th><td>XLR / HF → récepteurs régie</td></tr></tbody></table>
 <p class="description"><strong>À quoi ça sert ?</strong> Capture des voix sur le plateau avec ou sans fil, selon la mobilité souhaitée.</p>
@@ -1271,7 +1347,7 @@
 </div>
 </div>
 <article class="detail masqué"><div class="detail">
-<h2>Pupitre lumière (MA Lighting)</h2><p class="media"><img alt="Pupitre lumière (MA Lighting) — photo" loading="lazy" src="assets/img/pupitre-lumiere-ma.jpg"/></p>
+<h2>Pupitre lumière (MA Lighting)</h2>
 <div><span class="pastille">lumière</span><span class="pastille">contrôle</span></div>
 <table class="caracts"><tbody><tr><th>Protocoles</th><td>DMX/ArtNet</td></tr></tbody></table>
 <p class="description"><strong>À quoi ça sert ?</strong> Console principale de contrôle lumière pour créer des ambiances et mémoires.</p>
@@ -1279,15 +1355,14 @@
 </button>
 </div>
 </div>
-</section>
+<div aria-label="Audio — Liste (Régie bleue)" class="section-categorie masqué" data-cat="audio" data-espace="regie-bleue" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">A</div><div class="grandit"><h4 class="titre">[Placeholder] Audio</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Ce matériel est à renseigner.</p></div></article></button></div></div><div aria-label="Video — Liste (Régie bleue)" class="section-categorie masqué" data-cat="video" data-espace="regie-bleue" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">V</div><div class="grandit"><h4 class="titre">[Placeholder] Video</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Ce matériel est à renseigner.</p></div></article></button></div></div><div aria-label="Reseau — Liste (Régie bleue)" class="section-categorie masqué" data-cat="reseau" data-espace="regie-bleue" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">R</div><div class="grandit"><h4 class="titre">[Placeholder] Reseau</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Ce matériel est à renseigner.</p></div></article></button></div></div><div aria-label="Monitoring — Liste (Régie bleue)" class="section-categorie masqué" data-cat="monitoring" data-espace="regie-bleue" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">M</div><div class="grandit"><h4 class="titre">[Placeholder] Monitoring</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Ce matériel est à renseigner.</p></div></article></button></div></div><div aria-label="Cablerie — Liste (Régie bleue)" class="section-categorie masqué" data-cat="cablerie" data-espace="regie-bleue" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">C</div><div class="grandit"><h4 class="titre">[Placeholder] Cablerie</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Ce matériel est à renseigner.</p></div></article></button></div></div><div aria-label="Accessoires — Liste (Régie bleue)" class="section-categorie masqué" data-cat="accessoires" data-espace="regie-bleue" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">A</div><div class="grandit"><h4 class="titre">[Placeholder] Accessoires</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Ce matériel est à renseigner.</p></div></article></button></div></div><div aria-label="Plateau — Liste (Régie bleue)" class="section-categorie masqué" data-cat="plateau" data-espace="regie-bleue" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">P</div><div class="grandit"><h4 class="titre">[Placeholder] Plateau</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Ce matériel est à renseigner.</p></div></article></button></div></div><div aria-label="Audio — Liste (production)" class="section-categorie masqué" data-cat="audio" data-espace="production" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">A</div><div class="grandit"><h4 class="titre">[Placeholder] Audio</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Production — Audio</p></div></article></button></div></div><div aria-label="Video — Liste (production)" class="section-categorie masqué" data-cat="video" data-espace="production" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">V</div><div class="grandit"><h4 class="titre">[Placeholder] Video</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Production — Video</p></div></article></button></div></div><div aria-label="Reseau — Liste (production)" class="section-categorie masqué" data-cat="reseau" data-espace="production" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">R</div><div class="grandit"><h4 class="titre">[Placeholder] Reseau</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Production — Reseau</p></div></article></button></div></div><div aria-label="Monitoring — Liste (production)" class="section-categorie masqué" data-cat="monitoring" data-espace="production" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">M</div><div class="grandit"><h4 class="titre">[Placeholder] Monitoring</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Production — Monitoring</p></div></article></button></div></div><div aria-label="Cablerie — Liste (production)" class="section-categorie masqué" data-cat="cablerie" data-espace="production" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">C</div><div class="grandit"><h4 class="titre">[Placeholder] Cablerie</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Production — Cablerie</p></div></article></button></div></div><div aria-label="Accessoires — Liste (production)" class="section-categorie masqué" data-cat="accessoires" data-espace="production" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">A</div><div class="grandit"><h4 class="titre">[Placeholder] Accessoires</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Production — Accessoires</p></div></article></button></div></div><div aria-label="Plateau — Liste (production)" class="section-categorie masqué" data-cat="plateau" data-espace="production" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">P</div><div class="grandit"><h4 class="titre">[Placeholder] Plateau</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Production — Plateau</p></div></article></button></div></div><div aria-label="Audio — Liste (production son)" class="section-categorie masqué" data-cat="audio" data-espace="production-son" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">A</div><div class="grandit"><h4 class="titre">[Placeholder] Audio</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Production Son — Audio</p></div></article></button></div></div><div aria-label="Video — Liste (production son)" class="section-categorie masqué" data-cat="video" data-espace="production-son" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">V</div><div class="grandit"><h4 class="titre">[Placeholder] Video</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Production Son — Video</p></div></article></button></div></div><div aria-label="Reseau — Liste (production son)" class="section-categorie masqué" data-cat="reseau" data-espace="production-son" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">R</div><div class="grandit"><h4 class="titre">[Placeholder] Reseau</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Production Son — Reseau</p></div></article></button></div></div><div aria-label="Monitoring — Liste (production son)" class="section-categorie masqué" data-cat="monitoring" data-espace="production-son" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">M</div><div class="grandit"><h4 class="titre">[Placeholder] Monitoring</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Production Son — Monitoring</p></div></article></button></div></div><div aria-label="Cablerie — Liste (production son)" class="section-categorie masqué" data-cat="cablerie" data-espace="production-son" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">C</div><div class="grandit"><h4 class="titre">[Placeholder] Cablerie</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Production Son — Cablerie</p></div></article></button></div></div><div aria-label="Accessoires — Liste (production son)" class="section-categorie masqué" data-cat="accessoires" data-espace="production-son" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">A</div><div class="grandit"><h4 class="titre">[Placeholder] Accessoires</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Production Son — Accessoires</p></div></article></button></div></div><div aria-label="Plateau — Liste (production son)" class="section-categorie masqué" data-cat="plateau" data-espace="production-son" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">P</div><div class="grandit"><h4 class="titre">[Placeholder] Plateau</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Production Son — Plateau</p></div></article></button></div></div><div aria-label="Audio — Liste (magasin lumiere)" class="section-categorie masqué" data-cat="audio" data-espace="magasin-lumiere" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">A</div><div class="grandit"><h4 class="titre">[Placeholder] Audio</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Lumiere — Audio</p></div></article></button></div></div><div aria-label="Video — Liste (magasin lumiere)" class="section-categorie masqué" data-cat="video" data-espace="magasin-lumiere" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">V</div><div class="grandit"><h4 class="titre">[Placeholder] Video</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Lumiere — Video</p></div></article></button></div></div><div aria-label="Reseau — Liste (magasin lumiere)" class="section-categorie masqué" data-cat="reseau" data-espace="magasin-lumiere" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">R</div><div class="grandit"><h4 class="titre">[Placeholder] Reseau</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Lumiere — Reseau</p></div></article></button></div></div><div aria-label="Monitoring — Liste (magasin lumiere)" class="section-categorie masqué" data-cat="monitoring" data-espace="magasin-lumiere" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">M</div><div class="grandit"><h4 class="titre">[Placeholder] Monitoring</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Lumiere — Monitoring</p></div></article></button></div></div><div aria-label="Cablerie — Liste (magasin lumiere)" class="section-categorie masqué" data-cat="cablerie" data-espace="magasin-lumiere" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">C</div><div class="grandit"><h4 class="titre">[Placeholder] Cablerie</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Lumiere — Cablerie</p></div></article></button></div></div><div aria-label="Accessoires — Liste (magasin lumiere)" class="section-categorie masqué" data-cat="accessoires" data-espace="magasin-lumiere" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">A</div><div class="grandit"><h4 class="titre">[Placeholder] Accessoires</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Lumiere — Accessoires</p></div></article></button></div></div><div aria-label="Plateau — Liste (magasin lumiere)" class="section-categorie masqué" data-cat="plateau" data-espace="magasin-lumiere" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">P</div><div class="grandit"><h4 class="titre">[Placeholder] Plateau</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Lumiere — Plateau</p></div></article></button></div></div><div aria-label="Audio — Liste (magasin audio)" class="section-categorie masqué" data-cat="audio" data-espace="magasin-audio" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">A</div><div class="grandit"><h4 class="titre">[Placeholder] Audio</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Audio — Audio</p></div></article></button></div></div><div aria-label="Video — Liste (magasin audio)" class="section-categorie masqué" data-cat="video" data-espace="magasin-audio" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">V</div><div class="grandit"><h4 class="titre">[Placeholder] Video</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Audio — Video</p></div></article></button></div></div><div aria-label="Reseau — Liste (magasin audio)" class="section-categorie masqué" data-cat="reseau" data-espace="magasin-audio" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">R</div><div class="grandit"><h4 class="titre">[Placeholder] Reseau</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Audio — Reseau</p></div></article></button></div></div><div aria-label="Monitoring — Liste (magasin audio)" class="section-categorie masqué" data-cat="monitoring" data-espace="magasin-audio" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">M</div><div class="grandit"><h4 class="titre">[Placeholder] Monitoring</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Audio — Monitoring</p></div></article></button></div></div><div aria-label="Cablerie — Liste (magasin audio)" class="section-categorie masqué" data-cat="cablerie" data-espace="magasin-audio" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">C</div><div class="grandit"><h4 class="titre">[Placeholder] Cablerie</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Audio — Cablerie</p></div></article></button></div></div><div aria-label="Accessoires — Liste (magasin audio)" class="section-categorie masqué" data-cat="accessoires" data-espace="magasin-audio" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">A</div><div class="grandit"><h4 class="titre">[Placeholder] Accessoires</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Audio — Accessoires</p></div></article></button></div></div><div aria-label="Plateau — Liste (magasin audio)" class="section-categorie masqué" data-cat="plateau" data-espace="magasin-audio" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">P</div><div class="grandit"><h4 class="titre">[Placeholder] Plateau</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Audio — Plateau</p></div></article></button></div></div><div aria-label="Audio — Liste (magasin video)" class="section-categorie masqué" data-cat="audio" data-espace="magasin-video" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">A</div><div class="grandit"><h4 class="titre">[Placeholder] Audio</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Video — Audio</p></div></article></button></div></div><div aria-label="Video — Liste (magasin video)" class="section-categorie masqué" data-cat="video" data-espace="magasin-video" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">V</div><div class="grandit"><h4 class="titre">[Placeholder] Video</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Video — Video</p></div></article></button></div></div><div aria-label="Reseau — Liste (magasin video)" class="section-categorie masqué" data-cat="reseau" data-espace="magasin-video" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">R</div><div class="grandit"><h4 class="titre">[Placeholder] Reseau</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Video — Reseau</p></div></article></button></div></div><div aria-label="Monitoring — Liste (magasin video)" class="section-categorie masqué" data-cat="monitoring" data-espace="magasin-video" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">M</div><div class="grandit"><h4 class="titre">[Placeholder] Monitoring</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Video — Monitoring</p></div></article></button></div></div><div aria-label="Cablerie — Liste (magasin video)" class="section-categorie masqué" data-cat="cablerie" data-espace="magasin-video" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">C</div><div class="grandit"><h4 class="titre">[Placeholder] Cablerie</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Video — Cablerie</p></div></article></button></div></div><div aria-label="Accessoires — Liste (magasin video)" class="section-categorie masqué" data-cat="accessoires" data-espace="magasin-video" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">A</div><div class="grandit"><h4 class="titre">[Placeholder] Accessoires</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Video — Accessoires</p></div></article></button></div></div><div aria-label="Plateau — Liste (magasin video)" class="section-categorie masqué" data-cat="plateau" data-espace="magasin-video" role="region"><div class="cartes"><button aria-pressed="false" class="carte" type="button"><div class="ligne-carte"><div class="avatar">P</div><div class="grandit"><h4 class="titre">[Placeholder] Plateau</h4><div class="soustitre">À compléter</div><div class="etiquettes"><span class="etiquette">placeholder</span></div></div></div><article class="detail masqué"><div class="detail"><h2>[À compléter]</h2><p class="sous">Magasin Video — Plateau</p></div></article></button></div></div></section>
 <!-- =======================
          Panneau droite : Détail
          ======================= -->
 <aside aria-label="Fiche équipement" class="panneau panneau-detail" id="panneau-detail">
 <div class="attente" id="contenu-detail">Sélectionnez un équipement…</div>
 </aside>
-</main>
-<footer>
+</main><footer>
 <details class="apropos">
 <summary>À propos de ce site (cliquez ici pour lire une belle histoire)</summary>
 <div class="contenu-apropos">
@@ -1305,7 +1380,7 @@
 <p class="credit">Données cherchées par LEMAIRE Nolan, BERTRAND Steven, ALLAIN Gabriel, GOUBET Théandre et HAMIDOU Karim.</p>
 </div>
 </details>
-</footer>
+</footer></div>
 <script>
     /* =====================================================
        JS minimal — tout en français, avec ARIA et animations
@@ -1314,7 +1389,65 @@
       const $ = (sel, ctx=document)=>ctx.querySelector(sel);
       const $$ = (sel, ctx=document)=>Array.from(ctx.querySelectorAll(sel));
 
-      const sections = $$('.section-categorie');
+
+      // ——— Gestion des espaces (landing / régies / magasins) ———
+      let espaceActif = 'regie-verte'; // par défaut
+      const $landing = document.getElementById('landing');
+      const $app = document.getElementById('app');
+      const $switch = document.getElementById('switch-espaces');
+      const $btnOpenSwitch = document.getElementById('btn-open-switch');
+      const $btnCloseSwitch = document.getElementById('btn-close-switch');
+      const $titreMarque = document.querySelector('.marque');
+
+      function setEspace(nom){
+        hideAllSections();
+        try{ location.hash = '#' + nom; }catch(e){}
+        espaceActif = nom;
+        // afficher l'appli et masquer le landing
+        if($landing) $landing.classList.add('masqué');
+        if($app) $app.classList.remove('masqué');
+        // maj sous-titre header
+        if($titreMarque){
+          $titreMarque.querySelector('b').textContent = ({'regie-verte':'Régie verte','regie-bleue':'Régie bleue','production':'Production','production-son':'Production son','magasin-lumiere':'Magasin lumière','magasin-audio':'Magasin audio','magasin-video':'Magasin vidéo'})[nom] || 'Régie';
+        }
+        // activer la catégorie visible actuelle (ou vidéo par défaut)
+        const actif = document.querySelector('.bouton-rubrique[aria-current="page"]') || document.querySelector('.bouton-rubrique[data-cat="video"]');
+        if(actif){
+          const cat = actif.dataset.cat;
+          basculeCategorie(cat, true);
+          appliquerFiltre();
+          afficheAttente();
+        }
+      }
+
+      function openSwitch(){ $switch?.classList.add('ouvert'); $switch?.setAttribute('aria-hidden', 'false'); openDropdown(); }
+      function closeSwitch(){ $switch?.classList.remove('ouvert'); $switch?.setAttribute('aria-hidden', 'true'); }
+
+      // Écouteurs overlay
+      $btnOpenSwitch?.addEventListener('click', openSwitch);
+      document.addEventListener('click', (e)=>{ if(e.target.closest('#btn-open-switch')) openSwitch(); });
+      $btnCloseSwitch?.addEventListener('click', closeSwitch);
+      $switch?.addEventListener('click', (e)=>{ if(e.target === $switch) closeSwitch(); });
+
+      // Clics vers un espace (landing + overlay)
+      document.addEventListener('click', (e)=>{
+        const btn = e.target.closest('[data-espace-target]');
+        if(!btn) return;
+        const cible = btn.getAttribute('data-espace-target');
+        if(!cible) return;
+        setEspace(cible);
+        closeSwitch();
+      });
+
+      // Permet deep-link via hash (#regie-verte, #regie-bleue)
+      if(location.hash){
+        const nom = location.hash.replace('#','');
+        const ok = ['regie-verte','regie-bleue','production','production-son','magasin-lumiere','magasin-audio','magasin-video'].includes(nom);
+        if(ok) setEspace(nom);
+      }
+
+      // sections selon espace actif
+      function getSections(){ return $$('.section-categorie[data-espace="'+espaceActif+'"]'); }
       const boutonsRubrique = $$('.bouton-rubrique');
       const zoneCentre = $('.centre');
       const detail = $('#contenu-detail');
@@ -1325,7 +1458,7 @@
 
       function appliquerFiltre(){
         const q = (champRecherche && champRecherche.value || '').trim().toLowerCase();
-        const sectionActive = $('.section-categorie:not(.masqué)');
+        const sectionActive = $('.section-categorie[data-espace="'+espaceActif+'"]:not(.masqué)');
         if(!sectionActive) return;
         const cartes = $$('.carte', sectionActive);
         let visibles = 0;
@@ -1375,9 +1508,9 @@
       }
 
       // Bascule de catégorie avec masquage/affichage
-      function basculeCategorie(cat){
-        sections.forEach(sec=>{
-          const cible = sec.dataset.cat === cat;
+      function basculeCategorie(cat, silent){
+        getSections().forEach(sec=>{
+          const cible = (sec.dataset.cat === cat) && (sec.dataset.espace === espaceActif);
           if(cible){
             sec.classList.remove('masqué');
             animeFondu(sec);
@@ -1448,19 +1581,30 @@
         }
       })();
     })();
-  </script>
-<script>
-document.querySelectorAll('.media.video[data-yt]').forEach(function(p){
-  if (p.dataset._hydrated === "1") return;
-  var id = p.getAttribute('data-yt');
-  if(!id) return;
-  var iframe = document.createElement('iframe');
-  iframe.setAttribute('loading','lazy');
-  iframe.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
-  iframe.setAttribute('allowfullscreen','');
-  iframe.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?rel=0';
-  p.appendChild(iframe);
-  p.dataset._hydrated = "1";
-});
-</script></body>
+  
+      // Dropdown ancré au bouton "Espaces ▾"
+      const $dd = document.getElementById('dd-espaces');
+      function openDropdown(){
+        $dd?.classList.add('ouvert'); $dd?.setAttribute('aria-hidden','false');
+      }
+      function closeDropdown(){
+        $dd?.classList.remove('ouvert'); $dd?.setAttribute('aria-hidden','true');
+      }
+      $btnOpenSwitch?.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); if($dd?.classList.contains('ouvert')) closeDropdown(); else openDropdown(); });
+      document.addEventListener('click', (e)=>{ if(!e.target.closest('.header-actions')) closeDropdown(); });
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeDropdown(); });
+      function closeDropdownOnPageClick(e){
+        if(!$dd) return;
+        const inHeader = e.target.closest && e.target.closest('.header-actions');
+        if(!inHeader && $dd.classList.contains('ouvert')) closeDropdown();
+      }
+      document.addEventListener('click', closeDropdownOnPageClick, true);
+    
+
+      // Quand on change d'espace via dropdown ou landing/overlay
+      function hideAllSections(){
+        document.querySelectorAll('.section-categorie').forEach(sec=>sec.classList.add('masqué'));
+      }
+</script>
+<div aria-hidden="true" class="switch-espaces" id="switch-espaces"><div class="switch-panel anime-fondu"><div class="switch-header"><div class="switch-title">Changer d’espace</div><button class="switch-close" id="btn-close-switch" type="button">Fermer</button></div><div class="switch-grid"><button class="switch-item" data-espace-target="regie-verte" type="button"><span class="emoji">🎛️</span> Régie verte</button><button class="switch-item" data-espace-target="regie-bleue" type="button"><span class="emoji">🎚️</span> Régie bleue</button><button class="switch-item" data-espace-target="production" type="button"><span class="emoji">🎬</span> Production</button><button class="switch-item" data-espace-target="production-son" type="button"><span class="emoji">🎤</span> Production son</button><button class="switch-item" data-espace-target="magasin-lumiere" type="button"><span class="emoji">💡</span> Magasin lumière</button><button class="switch-item" data-espace-target="magasin-audio" type="button"><span class="emoji">🔊</span> Magasin audio</button><button class="switch-item" data-espace-target="magasin-video" type="button"><span class="emoji">📺</span> Magasin vidéo</button></div></div></div></body>
 </html>
