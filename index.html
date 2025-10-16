@@ -308,6 +308,7 @@
 <p aria-live="polite" class="indice masqué" id="etat-recherche"></p>
 </div>
 <ul class="rubriques">
+<li><button class="bouton-rubrique" data-cat="plan" type="button"><span class="emoji-rubrique">🗺️</span> Plan</button></li>
 <li><button class="bouton-rubrique" data-cat="audio" type="button"><span class="emoji-rubrique">🔊</span> Audio</button></li>
 <li><button aria-current="page" class="bouton-rubrique" data-cat="video" type="button"><span class="emoji-rubrique">🎥</span> Vidéo</button></li>
 <li><button class="bouton-rubrique" data-cat="reseau" type="button"><span class="emoji-rubrique">🌐</span> Réseau</button></li>
@@ -322,6 +323,36 @@
          Panneau centre : Listes
          ======================= -->
 <section aria-label="Liste d’équipements" class="panneau centre">
+
+<!-- PLAN -->
+<div aria-label="Plan — Liste" class="section-categorie" data-cat="plan" data-espace="regie-verte" role="region">
+  <div class="cartes">
+    <!-- PLAN GÉNÉRAL -->
+    <button aria-pressed="false" class="carte" data-id="plan-general" type="button">
+      <div class="ligne-carte">
+        <div class="avatar">P</div>
+        <div class="grandit">
+          <h4 class="titre">Plan général</h4>
+          <div class="soustitre">Vue d’ensemble — Régie verte</div>
+          <div class="etiquettes">
+            <span class="etiquette">plan</span>
+            <span class="etiquette">régie verte</span>
+          </div>
+        </div>
+      </div>
+      <article class="detail masqué">
+        <div class="detail">
+          <h2>Plan général</h2>
+          <p class="sous">Vue d’ensemble de la régie verte</p>
+          <figure class="media-photo">
+            <img src="synoptique.png" alt="Plan général de la régie verte"/>
+          </figure>
+        </div>
+      </article>
+    </button>
+  </div>
+</div>
+
 <!-- AUDIO -->
 <div aria-label="Audio — Liste" class="section-categorie masqué" data-cat="audio" data-espace="regie-verte" role="region">
 <div class="cartes">
